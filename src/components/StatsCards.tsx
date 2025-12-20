@@ -1,13 +1,17 @@
 import { Expense, categoryConfig, ExpenseCategory } from "@/lib/types";
-import { TrendingUp, TrendingDown, DollarSign, Calendar } from "lucide-react";
+import { TrendingUp, TrendingDown, DollarSign, Calendar, Target, Wallet } from "lucide-react";
 import { useMemo } from "react";
 import { startOfMonth, endOfMonth, isWithinInterval, subMonths } from "date-fns";
+import { useCurrency } from "@/contexts/CurrencyContext";
+import { formatCurrency } from "@/lib/currencies";
 
 interface StatsCardsProps {
   expenses: Expense[];
 }
 
 export function StatsCards({ expenses }: StatsCardsProps) {
+  const { currency } = useCurrency();
+
   const stats = useMemo(() => {
     const now = new Date();
     const thisMonthStart = startOfMonth(now);
@@ -37,6 +41,10 @@ export function StatsCards({ expenses }: StatsCardsProps) {
 
     const topCategory = Object.entries(categoryTotals).sort(([, a], [, b]) => b - a)[0];
 
+    // Average daily spending
+    const daysInMonth = new Date().getDate();
+    const avgDaily = daysInMonth > 0 ? thisMonthTotal / daysInMonth : 0;
+
     return {
       thisMonthTotal,
       lastMonthTotal,
@@ -46,30 +54,37 @@ export function StatsCards({ expenses }: StatsCardsProps) {
         category: topCategory[0] as ExpenseCategory,
         amount: topCategory[1],
       } : null,
+      avgDaily,
     };
   }, [expenses]);
 
   const cards = [
     {
       title: "This Month",
-      value: `$${stats.thisMonthTotal.toFixed(2)}`,
-      icon: DollarSign,
+      value: formatCurrency(stats.thisMonthTotal, currency),
+      icon: Wallet,
       description: "Total spending",
-      color: "primary",
+      gradient: "from-primary/20 to-primary/5",
+      iconBg: "bg-primary/10",
+      iconColor: "text-primary",
     },
     {
       title: "vs Last Month",
       value: `${stats.percentChange >= 0 ? "+" : ""}${stats.percentChange.toFixed(1)}%`,
       icon: stats.percentChange >= 0 ? TrendingUp : TrendingDown,
       description: stats.percentChange >= 0 ? "Spending increased" : "Spending decreased",
-      color: stats.percentChange >= 0 ? "warning" : "success",
+      gradient: stats.percentChange >= 0 ? "from-warning/20 to-warning/5" : "from-success/20 to-success/5",
+      iconBg: stats.percentChange >= 0 ? "bg-warning/10" : "bg-success/10",
+      iconColor: stats.percentChange >= 0 ? "text-warning" : "text-success",
     },
     {
-      title: "Transactions",
-      value: stats.transactionCount.toString(),
-      icon: Calendar,
-      description: "This month",
-      color: "chart-2",
+      title: "Daily Average",
+      value: formatCurrency(stats.avgDaily, currency),
+      icon: Target,
+      description: "Per day this month",
+      gradient: "from-chart-2/20 to-chart-2/5",
+      iconBg: "bg-chart-2/10",
+      iconColor: "text-chart-2",
     },
     {
       title: "Top Category",
@@ -78,9 +93,12 @@ export function StatsCards({ expenses }: StatsCardsProps) {
         : "—",
       icon: () => null,
       description: stats.topCategory
-        ? `${categoryConfig[stats.topCategory.category].label}: $${stats.topCategory.amount.toFixed(2)}`
+        ? `${categoryConfig[stats.topCategory.category].label}`
         : "No expenses yet",
-      color: "chart-3",
+      gradient: "from-chart-3/20 to-chart-3/5",
+      iconBg: "",
+      iconColor: "",
+      extraValue: stats.topCategory ? formatCurrency(stats.topCategory.amount, currency) : "",
     },
   ];
 
@@ -89,20 +107,23 @@ export function StatsCards({ expenses }: StatsCardsProps) {
       {cards.map((card, index) => (
         <div
           key={card.title}
-          className="glass-card rounded-xl p-5 animate-fade-in"
+          className={`glass-card rounded-xl p-5 animate-fade-in bg-gradient-to-br ${card.gradient}`}
           style={{ animationDelay: `${index * 100}ms` }}
         >
           <div className="flex items-start justify-between">
-            <div>
-              <p className="text-sm text-muted-foreground">{card.title}</p>
-              <p className="text-2xl font-display font-bold text-foreground mt-1">
+            <div className="space-y-1">
+              <p className="text-sm text-muted-foreground font-medium">{card.title}</p>
+              <p className="text-2xl font-display font-bold text-foreground">
                 {card.value}
               </p>
-              <p className="text-xs text-muted-foreground mt-1">{card.description}</p>
+              <p className="text-xs text-muted-foreground">{card.description}</p>
+              {card.extraValue && (
+                <p className="text-sm font-medium text-foreground">{card.extraValue}</p>
+              )}
             </div>
-            {card.icon !== (() => null) && (
-              <div className="p-2 rounded-lg bg-primary/10">
-                <card.icon className="w-5 h-5 text-primary" />
+            {card.icon !== (() => null) && card.iconBg && (
+              <div className={`p-2.5 rounded-xl ${card.iconBg}`}>
+                <card.icon className={`w-5 h-5 ${card.iconColor}`} />
               </div>
             )}
           </div>
