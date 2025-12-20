@@ -1,7 +1,13 @@
 import { useEffect, useState } from "react";
+import { Routes, Route } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { AuthForm } from "@/components/AuthForm";
-import { Dashboard } from "@/components/Dashboard";
+import { AppLayout } from "@/components/layout/AppLayout";
+import { DashboardPage } from "@/pages/DashboardPage";
+import { ExpensesPage } from "@/pages/ExpensesPage";
+import { AnalyticsPage } from "@/pages/AnalyticsPage";
+import { AIAdvisorPage } from "@/pages/AIAdvisorPage";
+import { SettingsPage } from "@/pages/SettingsPage";
 import { Session } from "@supabase/supabase-js";
 
 const Index = () => {
@@ -9,13 +15,11 @@ const Index = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setIsLoading(false);
     });
 
-    // Listen for auth changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -33,7 +37,21 @@ const Index = () => {
     );
   }
 
-  return session ? <Dashboard /> : <AuthForm />;
+  if (!session) {
+    return <AuthForm />;
+  }
+
+  return (
+    <AppLayout>
+      <Routes>
+        <Route path="/" element={<DashboardPage />} />
+        <Route path="/expenses" element={<ExpensesPage />} />
+        <Route path="/analytics" element={<AnalyticsPage />} />
+        <Route path="/ai-advisor" element={<AIAdvisorPage />} />
+        <Route path="/settings" element={<SettingsPage />} />
+      </Routes>
+    </AppLayout>
+  );
 };
 
 export default Index;
