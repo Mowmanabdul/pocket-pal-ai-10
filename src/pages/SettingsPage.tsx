@@ -1,16 +1,9 @@
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { currencies } from "@/lib/currencies";
-import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Settings, DollarSign, Palette, Bell, Shield } from "lucide-react";
+import { Settings as SettingsIcon, Globe, Palette, Bell, Shield, Check } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
 
 export function SettingsPage() {
   const { currency, setCurrency } = useCurrency();
@@ -22,90 +15,84 @@ export function SettingsPage() {
       setCurrency(newCurrency);
       toast({
         title: "Currency updated",
-        description: `Your currency has been changed to ${newCurrency.name} (${newCurrency.symbol})`,
+        description: `Now using ${newCurrency.name} (${newCurrency.symbol})`,
       });
     }
   };
 
   return (
-    <div className="p-6 space-y-6 max-w-2xl mx-auto">
-      <div>
-        <h1 className="text-2xl font-display font-bold text-foreground">Settings</h1>
-        <p className="text-muted-foreground">Customize your SpendWise experience</p>
+    <div className="p-4 md:p-6 space-y-6 max-w-2xl mx-auto">
+      {/* Header */}
+      <div className="animate-fade-in">
+        <h1 className="text-2xl md:text-3xl font-bold text-foreground flex items-center gap-3">
+          <SettingsIcon className="w-7 h-7 text-primary" />
+          Settings
+        </h1>
+        <p className="text-muted-foreground mt-1">Customize your experience</p>
       </div>
 
       {/* Currency Settings */}
-      <div className="glass-card rounded-2xl p-6 space-y-6">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-            <DollarSign className="w-5 h-5 text-primary" />
+      <div className="glass-card-elevated rounded-2xl p-5 md:p-6 space-y-5 animate-fade-in" style={{ animationDelay: "100ms" }}>
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+            <Globe className="w-6 h-6 text-primary" />
           </div>
           <div>
-            <h2 className="font-display font-semibold text-foreground">Currency</h2>
-            <p className="text-sm text-muted-foreground">Choose your preferred currency for displaying amounts</p>
+            <h2 className="font-semibold text-foreground">Currency</h2>
+            <p className="text-sm text-muted-foreground">Select your preferred currency</p>
           </div>
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="currency">Display Currency</Label>
-          <Select value={currency.code} onValueChange={handleCurrencyChange}>
-            <SelectTrigger className="w-full bg-secondary border-0">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {currencies.map((c) => (
-                <SelectItem key={c.code} value={c.code}>
-                  <span className="flex items-center gap-2">
-                    <span className="font-mono">{c.symbol}</span>
-                    <span>{c.name}</span>
-                    <span className="text-muted-foreground">({c.code})</span>
-                  </span>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+          {currencies.map((c) => (
+            <button
+              key={c.code}
+              onClick={() => handleCurrencyChange(c.code)}
+              className={cn(
+                "flex items-center gap-3 p-3 rounded-xl border-2 transition-all text-left",
+                currency.code === c.code
+                  ? "border-primary bg-primary/5"
+                  : "border-transparent bg-secondary hover:bg-secondary/80"
+              )}
+            >
+              <span className="text-2xl">{c.flag}</span>
+              <div className="flex-1 min-w-0">
+                <p className="font-semibold text-foreground truncate">{c.code}</p>
+                <p className="text-xs text-muted-foreground truncate">{c.symbol}</p>
+              </div>
+              {currency.code === c.code && (
+                <Check className="w-5 h-5 text-primary shrink-0" />
+              )}
+            </button>
+          ))}
         </div>
       </div>
 
-      {/* Coming Soon Features */}
+      {/* Coming Soon */}
       <div className="space-y-4">
-        <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Coming Soon</h3>
+        <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-1">Coming Soon</h3>
 
-        <div className="glass-card rounded-2xl p-6 opacity-60">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center">
-              <Palette className="w-5 h-5 text-muted-foreground" />
-            </div>
-            <div>
-              <h2 className="font-display font-semibold text-foreground">Appearance</h2>
-              <p className="text-sm text-muted-foreground">Customize colors and theme</p>
+        {[
+          { icon: Palette, title: "Appearance", desc: "Dark mode, colors & themes" },
+          { icon: Bell, title: "Notifications", desc: "Budget alerts & reminders" },
+          { icon: Shield, title: "Privacy", desc: "Data export & security" },
+        ].map((item, i) => (
+          <div
+            key={item.title}
+            className="glass-card rounded-2xl p-5 opacity-50 animate-fade-in"
+            style={{ animationDelay: `${200 + i * 100}ms` }}
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center">
+                <item.icon className="w-6 h-6 text-muted-foreground" />
+              </div>
+              <div>
+                <h2 className="font-semibold text-foreground">{item.title}</h2>
+                <p className="text-sm text-muted-foreground">{item.desc}</p>
+              </div>
             </div>
           </div>
-        </div>
-
-        <div className="glass-card rounded-2xl p-6 opacity-60">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center">
-              <Bell className="w-5 h-5 text-muted-foreground" />
-            </div>
-            <div>
-              <h2 className="font-display font-semibold text-foreground">Notifications</h2>
-              <p className="text-sm text-muted-foreground">Budget alerts and reminders</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="glass-card rounded-2xl p-6 opacity-60">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center">
-              <Shield className="w-5 h-5 text-muted-foreground" />
-            </div>
-            <div>
-              <h2 className="font-display font-semibold text-foreground">Data & Privacy</h2>
-              <p className="text-sm text-muted-foreground">Export data and manage privacy</p>
-            </div>
-          </div>
-        </div>
+        ))}
       </div>
     </div>
   );
