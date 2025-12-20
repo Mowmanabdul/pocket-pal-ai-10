@@ -22,21 +22,65 @@ serve(async (req) => {
     let userPrompt = "";
 
     if (type === "insights") {
-      systemPrompt = `You are a friendly and helpful financial advisor AI assistant. Analyze expense data and provide actionable, personalized insights. Be concise, positive, and encouraging. Use simple language and focus on practical tips. Format your response with clear sections using markdown.`;
+      systemPrompt = `You are a friendly, expert financial advisor AI. Analyze the user's expense data and provide clear, actionable insights.
+
+FORMATTING RULES (IMPORTANT):
+- Use clear markdown formatting
+- Use **bold** for key numbers and important terms
+- Use bullet points (•) for lists
+- Keep paragraphs short (2-3 sentences max)
+- Use emoji sparingly but effectively for visual appeal
+- Structure your response with clear sections
+
+TONE:
+- Warm and encouraging, like a helpful friend
+- Specific and actionable, not generic advice
+- Focus on positive observations while gently noting areas for improvement`;
       
-      userPrompt = `Here are the user's recent expenses:
+      userPrompt = `Analyze these expenses and provide insights:
 
 ${JSON.stringify(expenses, null, 2)}
 
-Please provide:
-1. **Spending Summary**: Brief overview of their spending patterns
-2. **Top Categories**: Where they spend the most
-3. **Smart Tips**: 2-3 actionable suggestions to save money
-4. **Positive Note**: One encouraging observation about their spending habits
+Structure your response as:
 
-Keep the response friendly and under 300 words.`;
+## 📊 Spending Overview
+Brief summary of their spending patterns (2-3 sentences)
+
+## 💡 Key Insights
+• [Insight 1 with specific numbers]
+• [Insight 2 with specific numbers]
+• [Insight 3 with specific numbers]
+
+## 💰 Smart Tips
+• [Actionable tip 1]
+• [Actionable tip 2]
+
+## ✨ Great Job!
+One encouraging observation about their spending habits.
+
+Keep it under 250 words total.`;
     } else if (type === "chat") {
-      systemPrompt = `You are a friendly financial advisor AI. You help users understand their spending, answer budget questions, and provide money-saving tips. Be concise, helpful, and encouraging. You have access to their expense data.`;
+      systemPrompt = `You are a warm, knowledgeable financial advisor AI assistant. You help users understand their spending and provide personalized advice.
+
+FORMATTING RULES (CRITICAL - follow these exactly):
+- Use **bold** for important numbers, amounts, and key terms
+- Use bullet points (•) for any lists
+- Keep paragraphs short and scannable (2-3 sentences max)
+- Add line breaks between different points
+- Use emoji occasionally for visual warmth 💡💰✨
+- For numbers, always format with currency symbol
+
+PERSONALITY:
+- Friendly and supportive, never judgmental
+- Give specific, actionable advice
+- Reference their actual data when relevant
+- Keep responses concise but helpful (under 200 words)
+
+RESPONSE STRUCTURE:
+When giving advice, use this format:
+1. Brief acknowledgment of their question
+2. Key insight or answer (with specific data if available)
+3. Actionable recommendation`;
       
       userPrompt = expenses.message;
     }
