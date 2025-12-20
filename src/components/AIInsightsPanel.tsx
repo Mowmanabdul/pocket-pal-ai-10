@@ -21,31 +21,42 @@ export function AIInsightsPanel({ expenses }: AIInsightsPanelProps) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Sparkles className="w-5 h-5 text-primary" />
-          <h3 className="font-display font-semibold text-foreground">AI Insights</h3>
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+            <Sparkles className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <h3 className="font-bold text-foreground">AI Insights</h3>
+            <p className="text-xs text-muted-foreground">Personalized analysis</p>
+          </div>
         </div>
         <Button
-          variant="ghost"
+          variant="outline"
           size="sm"
           onClick={() => getInsights(expenses)}
           disabled={isLoading}
-          className="text-muted-foreground hover:text-foreground"
+          className="rounded-xl"
         >
-          <RefreshCw className={`w-4 h-4 mr-1 ${isLoading ? "animate-spin" : ""}`} />
+          <RefreshCw className={`w-4 h-4 mr-2 ${isLoading ? "animate-spin" : ""}`} />
           Refresh
         </Button>
       </div>
 
-      <div className="min-h-[200px] p-4 rounded-lg bg-secondary/50">
+      <div className="min-h-[250px] p-5 rounded-xl bg-secondary/50">
         {isLoading && !insights ? (
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <div className="w-2 h-2 rounded-full bg-primary animate-pulse-soft" />
-            <span>Analyzing your spending patterns...</span>
+          <div className="flex flex-col items-center justify-center h-[200px] gap-3">
+            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+              <Sparkles className="w-5 h-5 text-primary animate-pulse" />
+            </div>
+            <p className="text-muted-foreground text-sm">Analyzing your spending patterns...</p>
+          </div>
+        ) : insights ? (
+          <div className="ai-markdown">
+            <ReactMarkdown>{insights}</ReactMarkdown>
           </div>
         ) : (
-          <div className="prose prose-sm dark:prose-invert max-w-none text-foreground">
-            <ReactMarkdown>{insights || "Click refresh to get AI insights about your spending."}</ReactMarkdown>
+          <div className="flex flex-col items-center justify-center h-[200px] gap-3">
+            <p className="text-muted-foreground">Click refresh to generate insights</p>
           </div>
         )}
       </div>

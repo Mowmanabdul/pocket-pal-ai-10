@@ -18,12 +18,18 @@ interface AIChatPanelProps {
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-insights`;
 
+const suggestedQuestions = [
+  "How can I save more money?",
+  "What is my biggest expense?",
+  "Give me budgeting tips",
+];
+
 export function AIChatPanel({ expenses }: AIChatPanelProps) {
   const { currency } = useCurrency();
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content: "Hey! 👋 I'm your AI financial advisor. Ask me anything about your spending, savings tips, or budgeting advice. I've got your back!",
+      content: "Hey there! 👋 I'm your **AI financial advisor**. I can help you:\n\n• Understand your spending patterns\n• Find ways to save money\n• Create better budgeting habits\n\nAsk me anything about your finances!",
     },
   ]);
   const [input, setInput] = useState("");
@@ -38,10 +44,10 @@ export function AIChatPanel({ expenses }: AIChatPanelProps) {
     scrollToBottom();
   }, [messages]);
 
-  const sendMessage = async () => {
-    if (!input.trim() || isLoading) return;
+  const sendMessage = async (messageText?: string) => {
+    const userMessage = (messageText || input).trim();
+    if (!userMessage || isLoading) return;
 
-    const userMessage = input.trim();
     setInput("");
     setMessages((prev) => [...prev, { role: "user", content: userMessage }]);
     setIsLoading(true);
@@ -64,7 +70,7 @@ export function AIChatPanel({ expenses }: AIChatPanelProps) {
           expenses: {
             message: `User's currency: ${currency.code} (${currency.symbol})
             
-User's recent expenses: ${JSON.stringify(expenseContext)}
+User's recent expenses (${expenses.length} total): ${JSON.stringify(expenseContext)}
 
 User's question: ${userMessage}`,
           },
@@ -144,7 +150,7 @@ User's question: ${userMessage}`,
             )}
           >
             {msg.role === "assistant" && (
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-accent to-chart-3 flex items-center justify-center shrink-0 shadow-soft">
+              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center shrink-0 shadow-lg">
                 <Sparkles className="w-4 h-4 text-white" />
               </div>
             )}
@@ -152,41 +158,60 @@ User's question: ${userMessage}`,
               className={cn(
                 "max-w-[85%] rounded-2xl px-4 py-3",
                 msg.role === "user"
-                  ? "bg-primary text-primary-foreground rounded-br-md"
-                  : "bg-secondary text-foreground rounded-bl-md"
+                  ? "bg-primary text-primary-foreground rounded-br-sm"
+                  : "bg-secondary rounded-bl-sm"
               )}
             >
               {msg.role === "assistant" ? (
-                <div className="prose prose-sm dark:prose-invert max-w-none [&>p]:m-0 [&>ul]:m-0 [&>ol]:m-0">
+                <div className="ai-markdown">
                   <ReactMarkdown>{msg.content || "..."}</ReactMarkdown>
                 </div>
               ) : (
-                <p>{msg.content}</p>
+                <p className="text-[15px]">{msg.content}</p>
               )}
             </div>
             {msg.role === "user" && (
-              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+              <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                 <User className="w-4 h-4 text-primary" />
               </div>
             )}
           </div>
         ))}
+        
         {isLoading && messages[messages.length - 1]?.role !== "assistant" && (
           <div className="flex gap-3">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-accent to-chart-3 flex items-center justify-center">
+            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
               <Sparkles className="w-4 h-4 text-white animate-pulse" />
             </div>
-            <div className="bg-secondary rounded-2xl rounded-bl-md px-4 py-3">
+            <div className="bg-secondary rounded-2xl rounded-bl-sm px-4 py-3">
               <div className="flex gap-1.5">
-                <span className="w-2 h-2 bg-muted-foreground/50 rounded-full animate-bounce" />
-                <span className="w-2 h-2 bg-muted-foreground/50 rounded-full animate-bounce [animation-delay:0.15s]" />
-                <span className="w-2 h-2 bg-muted-foreground/50 rounded-full animate-bounce [animation-delay:0.3s]" />
+                <span className="w-2 h-2 bg-muted-foreground/40 rounded-full animate-bounce" />
+                <span className="w-2 h-2 bg-muted-foreground/40 rounded-full animate-bounce [animation-delay:0.15s]" />
+                <span className="w-2 h-2 bg-muted-foreground/40 rounded-full animate-bounce [animation-delay:0.3s]" />
               </div>
             </div>
           </div>
         )}
         <div ref={messagesEndRef} />
       </div>
+
+      {/* Suggested questions */}
+      {messages.length <= 2 && !isLoading && (
+        <div className="px-4 pb-2">
+          <p className="text-xs text-muted-foreground mb-2 font-medium">Try asking:</p>
+          <div className="flex flex-wrap gap-2">
+            {suggestedQuestions.map((q) => (
+              <button
+                key={q}
+                onClick={() => sendMessage(q)}
+                className="text-xs px-3 py-1.5 rounded-full bg-secondary hover:bg-secondary/80 text-foreground transition-colors"
+              >
+                {q}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="p-4 border-t border-border bg-card/50">
         <form
@@ -200,14 +225,14 @@ User's question: ${userMessage}`,
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Ask me anything..."
-            className="flex-1 h-11 bg-secondary border-0 rounded-xl"
+            className="flex-1 h-12 bg-secondary border-0 rounded-xl text-[15px]"
             disabled={isLoading}
           />
           <Button
             type="submit"
             disabled={isLoading || !input.trim()}
             size="icon"
-            className="h-11 w-11 rounded-xl bg-primary text-primary-foreground shrink-0"
+            className="h-12 w-12 rounded-xl bg-primary text-primary-foreground shrink-0"
           >
             <Send className="w-5 h-5" />
           </Button>
