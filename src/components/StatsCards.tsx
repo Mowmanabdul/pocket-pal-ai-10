@@ -1,5 +1,5 @@
 import { Expense, categoryConfig, ExpenseCategory } from "@/lib/types";
-import { TrendingUp, TrendingDown, DollarSign, Calendar, Target, Wallet } from "lucide-react";
+import { TrendingUp, TrendingDown, Wallet, Target, Zap, ArrowUpRight, ArrowDownRight } from "lucide-react";
 import { useMemo } from "react";
 import { startOfMonth, endOfMonth, isWithinInterval, subMonths } from "date-fns";
 import { useCurrency } from "@/contexts/CurrencyContext";
@@ -33,7 +33,6 @@ export function StatsCards({ expenses }: StatsCardsProps) {
       ? ((thisMonthTotal - lastMonthTotal) / lastMonthTotal) * 100
       : 0;
 
-    // Top category
     const categoryTotals = thisMonthExpenses.reduce((acc, e) => {
       acc[e.category] = (acc[e.category] || 0) + Number(e.amount);
       return acc;
@@ -41,7 +40,6 @@ export function StatsCards({ expenses }: StatsCardsProps) {
 
     const topCategory = Object.entries(categoryTotals).sort(([, a], [, b]) => b - a)[0];
 
-    // Average daily spending
     const daysInMonth = new Date().getDate();
     const avgDaily = daysInMonth > 0 ? thisMonthTotal / daysInMonth : 0;
 
@@ -58,77 +56,88 @@ export function StatsCards({ expenses }: StatsCardsProps) {
     };
   }, [expenses]);
 
-  const cards = [
-    {
-      title: "This Month",
-      value: formatCurrency(stats.thisMonthTotal, currency),
-      icon: Wallet,
-      description: "Total spending",
-      gradient: "from-primary/20 to-primary/5",
-      iconBg: "bg-primary/10",
-      iconColor: "text-primary",
-    },
-    {
-      title: "vs Last Month",
-      value: `${stats.percentChange >= 0 ? "+" : ""}${stats.percentChange.toFixed(1)}%`,
-      icon: stats.percentChange >= 0 ? TrendingUp : TrendingDown,
-      description: stats.percentChange >= 0 ? "Spending increased" : "Spending decreased",
-      gradient: stats.percentChange >= 0 ? "from-warning/20 to-warning/5" : "from-success/20 to-success/5",
-      iconBg: stats.percentChange >= 0 ? "bg-warning/10" : "bg-success/10",
-      iconColor: stats.percentChange >= 0 ? "text-warning" : "text-success",
-    },
-    {
-      title: "Daily Average",
-      value: formatCurrency(stats.avgDaily, currency),
-      icon: Target,
-      description: "Per day this month",
-      gradient: "from-chart-2/20 to-chart-2/5",
-      iconBg: "bg-chart-2/10",
-      iconColor: "text-chart-2",
-    },
-    {
-      title: "Top Category",
-      value: stats.topCategory
-        ? categoryConfig[stats.topCategory.category].icon
-        : "—",
-      icon: () => null,
-      description: stats.topCategory
-        ? `${categoryConfig[stats.topCategory.category].label}`
-        : "No expenses yet",
-      gradient: "from-chart-3/20 to-chart-3/5",
-      iconBg: "",
-      iconColor: "",
-      extraValue: stats.topCategory ? formatCurrency(stats.topCategory.amount, currency) : "",
-    },
-  ];
-
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-      {cards.map((card, index) => (
-        <div
-          key={card.title}
-          className={`glass-card rounded-xl p-5 animate-fade-in bg-gradient-to-br ${card.gradient}`}
-          style={{ animationDelay: `${index * 100}ms` }}
-        >
-          <div className="flex items-start justify-between">
-            <div className="space-y-1">
-              <p className="text-sm text-muted-foreground font-medium">{card.title}</p>
-              <p className="text-2xl font-display font-bold text-foreground">
-                {card.value}
-              </p>
-              <p className="text-xs text-muted-foreground">{card.description}</p>
-              {card.extraValue && (
-                <p className="text-sm font-medium text-foreground">{card.extraValue}</p>
-              )}
-            </div>
-            {card.icon !== (() => null) && card.iconBg && (
-              <div className={`p-2.5 rounded-xl ${card.iconBg}`}>
-                <card.icon className={`w-5 h-5 ${card.iconColor}`} />
-              </div>
-            )}
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+      {/* Total Spending */}
+      <div className="stat-card glass-card-elevated animate-fade-in" style={{ animationDelay: "0ms" }}>
+        <div className="flex items-start justify-between">
+          <div>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">This Month</p>
+            <p className="text-2xl md:text-3xl font-bold text-foreground mt-1">
+              {formatCurrency(stats.thisMonthTotal, currency)}
+            </p>
+            <p className="text-xs text-muted-foreground mt-1">Total spending</p>
+          </div>
+          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+            <Wallet className="w-5 h-5 text-primary" />
           </div>
         </div>
-      ))}
+      </div>
+
+      {/* Comparison */}
+      <div className="stat-card glass-card-elevated animate-fade-in" style={{ animationDelay: "100ms" }}>
+        <div className="flex items-start justify-between">
+          <div>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">vs Last Month</p>
+            <div className="flex items-center gap-2 mt-1">
+              <p className={`text-2xl md:text-3xl font-bold ${stats.percentChange <= 0 ? "text-success" : "text-warning"}`}>
+                {stats.percentChange >= 0 ? "+" : ""}{stats.percentChange.toFixed(0)}%
+              </p>
+              {stats.percentChange <= 0 ? (
+                <ArrowDownRight className="w-5 h-5 text-success" />
+              ) : (
+                <ArrowUpRight className="w-5 h-5 text-warning" />
+              )}
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              {stats.percentChange <= 0 ? "You're saving!" : "Spending more"}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Daily Average */}
+      <div className="stat-card glass-card-elevated animate-fade-in" style={{ animationDelay: "200ms" }}>
+        <div className="flex items-start justify-between">
+          <div>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Daily Average</p>
+            <p className="text-2xl md:text-3xl font-bold text-foreground mt-1">
+              {formatCurrency(stats.avgDaily, currency)}
+            </p>
+            <p className="text-xs text-muted-foreground mt-1">Per day this month</p>
+          </div>
+          <div className="w-10 h-10 rounded-xl bg-chart-2/10 flex items-center justify-center">
+            <Target className="w-5 h-5 text-chart-2" />
+          </div>
+        </div>
+      </div>
+
+      {/* Top Category */}
+      <div className="stat-card glass-card-elevated animate-fade-in" style={{ animationDelay: "300ms" }}>
+        <div className="flex items-start justify-between">
+          <div>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Top Category</p>
+            {stats.topCategory ? (
+              <>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-2xl">{categoryConfig[stats.topCategory.category].icon}</span>
+                  <span className="font-bold text-foreground">
+                    {categoryConfig[stats.topCategory.category].label}
+                  </span>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {formatCurrency(stats.topCategory.amount, currency)}
+                </p>
+              </>
+            ) : (
+              <p className="text-lg font-medium text-muted-foreground mt-1">No data yet</p>
+            )}
+          </div>
+          <div className="w-10 h-10 rounded-xl bg-chart-3/10 flex items-center justify-center">
+            <Zap className="w-5 h-5 text-chart-3" />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

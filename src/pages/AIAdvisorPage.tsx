@@ -1,58 +1,63 @@
 import { useExpenses } from "@/hooks/useExpenses";
 import { AIChatPanel } from "@/components/AIChatPanel";
 import { AIInsightsPanel } from "@/components/AIInsightsPanel";
-import { Sparkles, MessageCircle, Lightbulb } from "lucide-react";
+import { Sparkles, MessageCircle, Lightbulb, Bot } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export function AIAdvisorPage() {
   const { expenses } = useExpenses();
 
   return (
-    <div className="p-6 space-y-6 max-w-4xl mx-auto">
-      <div>
+    <div className="p-4 md:p-6 space-y-6 max-w-4xl mx-auto">
+      {/* Header */}
+      <div className="animate-fade-in">
         <div className="flex items-center gap-3 mb-2">
-          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-            <Sparkles className="w-5 h-5 text-primary" />
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-accent to-chart-3 flex items-center justify-center shadow-lg">
+            <Bot className="w-6 h-6 text-white" />
           </div>
-          <h1 className="text-2xl font-display font-bold text-foreground">AI Financial Advisor</h1>
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground">AI Advisor</h1>
+            <p className="text-sm text-muted-foreground">Your personal finance assistant</p>
+          </div>
         </div>
-        <p className="text-muted-foreground">
-          Get personalized insights and chat with your AI advisor about your spending
-        </p>
       </div>
 
+      {/* Tabs */}
       <Tabs defaultValue="chat" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 mb-6">
-          <TabsTrigger value="chat" className="flex items-center gap-2">
+        <TabsList className="grid w-full grid-cols-2 h-12 rounded-xl bg-secondary p-1">
+          <TabsTrigger value="chat" className="flex items-center gap-2 rounded-lg font-medium data-[state=active]:bg-card data-[state=active]:shadow-soft">
             <MessageCircle className="w-4 h-4" />
             Chat
           </TabsTrigger>
-          <TabsTrigger value="insights" className="flex items-center gap-2">
+          <TabsTrigger value="insights" className="flex items-center gap-2 rounded-lg font-medium data-[state=active]:bg-card data-[state=active]:shadow-soft">
             <Lightbulb className="w-4 h-4" />
             Insights
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="chat">
-          <div className="glass-card rounded-2xl overflow-hidden">
+        <TabsContent value="chat" className="mt-4">
+          <div className="glass-card-elevated rounded-2xl overflow-hidden animate-fade-in">
             <AIChatPanel expenses={expenses} />
           </div>
         </TabsContent>
 
-        <TabsContent value="insights">
-          <div className="glass-card rounded-2xl p-6">
+        <TabsContent value="insights" className="mt-4">
+          <div className="glass-card-elevated rounded-2xl p-5 md:p-6 animate-fade-in">
             <AIInsightsPanel expenses={expenses} />
           </div>
         </TabsContent>
       </Tabs>
 
-      <div className="glass-card rounded-xl p-4 bg-primary/5 border-primary/20">
+      {/* Tips Card */}
+      <div className="glass-card rounded-2xl p-4 border-primary/20 bg-primary/5 animate-fade-in" style={{ animationDelay: "200ms" }}>
         <div className="flex items-start gap-3">
-          <Lightbulb className="w-5 h-5 text-primary mt-0.5" />
+          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+            <Sparkles className="w-5 h-5 text-primary" />
+          </div>
           <div>
-            <p className="text-sm font-medium text-foreground">Pro Tip</p>
-            <p className="text-sm text-muted-foreground">
-              Try asking questions like "How can I reduce my food spending?" or "What's my biggest expense category?"
+            <p className="font-semibold text-foreground">Try asking</p>
+            <p className="text-sm text-muted-foreground mt-1">
+              "How can I save more?" • "What's my biggest expense?" • "Give me budgeting tips"
             </p>
           </div>
         </div>

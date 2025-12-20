@@ -6,8 +6,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ExpenseCategory, categoryConfig } from "@/lib/types";
-import { Search } from "lucide-react";
+import { categoryConfig } from "@/lib/types";
+import { Search, SlidersHorizontal } from "lucide-react";
 
 interface ExpenseFiltersProps {
   search: string;
@@ -29,43 +29,46 @@ export function ExpenseFilters({
   return (
     <div className="flex flex-col sm:flex-row gap-3">
       <div className="relative flex-1">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <Input
           placeholder="Search expenses..."
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="pl-10 bg-secondary border-0"
+          className="pl-11 h-11 bg-secondary border-0 rounded-xl"
         />
       </div>
 
-      <Select value={category} onValueChange={onCategoryChange}>
-        <SelectTrigger className="w-full sm:w-[180px] bg-secondary border-0">
-          <SelectValue placeholder="All Categories" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">All Categories</SelectItem>
-          {Object.entries(categoryConfig).map(([key, { label, icon }]) => (
-            <SelectItem key={key} value={key}>
-              <span className="flex items-center gap-2">
-                <span>{icon}</span>
-                <span>{label}</span>
-              </span>
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      <div className="flex gap-2">
+        <Select value={category} onValueChange={onCategoryChange}>
+          <SelectTrigger className="w-full sm:w-[160px] h-11 bg-secondary border-0 rounded-xl">
+            <SelectValue placeholder="Category" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Categories</SelectItem>
+            {Object.entries(categoryConfig).map(([key, { label, icon }]) => (
+              <SelectItem key={key} value={key}>
+                <span className="flex items-center gap-2">
+                  <span>{icon}</span>
+                  <span>{label}</span>
+                </span>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
 
-      <Select value={sortBy} onValueChange={onSortChange}>
-        <SelectTrigger className="w-full sm:w-[160px] bg-secondary border-0">
-          <SelectValue placeholder="Sort by" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="date-desc">Newest First</SelectItem>
-          <SelectItem value="date-asc">Oldest First</SelectItem>
-          <SelectItem value="amount-desc">Highest Amount</SelectItem>
-          <SelectItem value="amount-asc">Lowest Amount</SelectItem>
-        </SelectContent>
-      </Select>
+        <Select value={sortBy} onValueChange={onSortChange}>
+          <SelectTrigger className="w-full sm:w-[140px] h-11 bg-secondary border-0 rounded-xl">
+            <SlidersHorizontal className="w-4 h-4 mr-2" />
+            <SelectValue placeholder="Sort" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="date-desc">Newest</SelectItem>
+            <SelectItem value="date-asc">Oldest</SelectItem>
+            <SelectItem value="amount-desc">Highest</SelectItem>
+            <SelectItem value="amount-asc">Lowest</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
     </div>
   );
 }
