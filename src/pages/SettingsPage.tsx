@@ -1,7 +1,7 @@
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { useTheme, themeConfigs, ThemeColor } from "@/contexts/ThemeContext";
 import { currencies } from "@/lib/currencies";
-import { Label } from "@/components/ui/label";
+import { BudgetSettings } from "@/components/BudgetSettings";
 import { Settings as SettingsIcon, Globe, Palette, Bell, Shield, Check, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -132,6 +132,11 @@ export function SettingsPage() {
             </button>
           ))}
         </div>
+      </div>
+
+      {/* Budget Settings */}
+      <div className="animate-fade-in" style={{ animationDelay: "125ms" }}>
+        <BudgetSettings />
       </div>
 
       {/* Coming Soon */}
