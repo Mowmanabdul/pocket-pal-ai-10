@@ -8,6 +8,7 @@ import { ExpensesPage } from "@/pages/ExpensesPage";
 import { AnalyticsPage } from "@/pages/AnalyticsPage";
 import { AIAdvisorPage } from "@/pages/AIAdvisorPage";
 import { SettingsPage } from "@/pages/SettingsPage";
+import { RecurringPage } from "@/pages/RecurringPage";
 import { Session } from "@supabase/supabase-js";
 
 const Index = () => {
@@ -46,6 +47,7 @@ const Index = () => {
       <Routes>
         <Route path="/" element={<DashboardPage />} />
         <Route path="/expenses" element={<ExpensesPage />} />
+        <Route path="/recurring" element={<RecurringPage />} />
         <Route path="/analytics" element={<AnalyticsPage />} />
         <Route path="/ai-advisor" element={<AIAdvisorPage />} />
         <Route path="/settings" element={<SettingsPage />} />
