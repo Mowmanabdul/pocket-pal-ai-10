@@ -2,6 +2,7 @@ import { useExpenses } from "@/hooks/useExpenses";
 import { StatsCards } from "@/components/StatsCards";
 import { SpendingChart } from "@/components/SpendingChart";
 import { SpendingTrends } from "@/components/SpendingTrends";
+import { BudgetProgress } from "@/components/BudgetProgress";
 import { ExpenseList } from "@/components/ExpenseList";
 import { ExpenseForm } from "@/components/ExpenseForm";
 import { Button } from "@/components/ui/button";
@@ -105,6 +106,11 @@ export function DashboardPage() {
             </div>
           </div>
         </Link>
+      </div>
+
+      {/* Budget Progress */}
+      <div className="animate-fade-in" style={{ animationDelay: "475ms" }}>
+        <BudgetProgress expenses={expenses} />
       </div>
 
       {/* Charts Grid */}
