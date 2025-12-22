@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ExpenseCategory, categoryConfig } from "@/lib/types";
 import { useBudgets } from "@/hooks/useBudgets";
 import { useCurrency } from "@/contexts/CurrencyContext";
+import { useCategoryLabelsContext } from "@/contexts/CategoryLabelsContext";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -15,6 +16,7 @@ const categories: ExpenseCategory[] = [
 export function BudgetSettings() {
   const { budgets, upsertBudget, deleteBudget, isLoading } = useBudgets();
   const { currency } = useCurrency();
+  const { getCategoryConfig } = useCategoryLabelsContext();
   const [editingAmounts, setEditingAmounts] = useState<Record<string, string>>({});
 
   const handleAmountChange = (category: ExpenseCategory, value: string) => {
@@ -75,7 +77,7 @@ export function BudgetSettings() {
       </CardHeader>
       <CardContent className="p-4 space-y-3">
         {categories.map((category) => {
-          const config = categoryConfig[category];
+          const config = getCategoryConfig(category);
           const currentAmount = getBudgetAmount(category);
           const displayValue = getDisplayValue(category);
           const hasChanges = editingAmounts[category] !== undefined && 

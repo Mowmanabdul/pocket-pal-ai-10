@@ -1,8 +1,9 @@
 import { useMemo } from "react";
 import { startOfMonth, endOfMonth, isWithinInterval } from "date-fns";
-import { ExpenseCategory, categoryConfig, Expense } from "@/lib/types";
+import { ExpenseCategory, Expense } from "@/lib/types";
 import { useBudgets } from "@/hooks/useBudgets";
 import { useCurrency } from "@/contexts/CurrencyContext";
+import { useCategoryLabelsContext } from "@/contexts/CategoryLabelsContext";
 import { formatCurrency } from "@/lib/currencies";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -15,6 +16,7 @@ interface BudgetProgressProps {
 export function BudgetProgress({ expenses }: BudgetProgressProps) {
   const { budgets, isLoading } = useBudgets();
   const { currency } = useCurrency();
+  const { getCategoryConfig } = useCategoryLabelsContext();
 
   const categorySpending = useMemo(() => {
     const now = new Date();
@@ -52,7 +54,6 @@ export function BudgetProgress({ expenses }: BudgetProgressProps) {
         remaining,
         isOverBudget,
         isNearLimit,
-        config: categoryConfig[budget.category]
       };
     }).sort((a, b) => b.percentage - a.percentage);
   }, [budgets, categorySpending]);
@@ -125,12 +126,14 @@ export function BudgetProgress({ expenses }: BudgetProgressProps) {
         />
       </CardHeader>
       <CardContent className="p-4 space-y-4">
-        {budgetItems.map((item) => (
+        {budgetItems.map((item) => {
+          const config = getCategoryConfig(item.category);
+          return (
           <div key={item.id} className="space-y-2">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="text-lg">{item.config.icon}</span>
-                <span className="font-medium text-sm">{item.config.label}</span>
+                <span className="text-lg">{config.icon}</span>
+                <span className="font-medium text-sm">{config.label}</span>
                 {item.isOverBudget && (
                   <AlertTriangle className="h-4 w-4 text-destructive" />
                 )}
@@ -170,7 +173,8 @@ export function BudgetProgress({ expenses }: BudgetProgressProps) {
               </span>
             </div>
           </div>
-        ))}
+          );
+        })}
       </CardContent>
     </Card>
   );

@@ -1,6 +1,7 @@
-import { Expense, categoryConfig, ExpenseCategory } from "@/lib/types";
+import { Expense, ExpenseCategory } from "@/lib/types";
 import { useMemo } from "react";
 import { useCurrency } from "@/contexts/CurrencyContext";
+import { useCategoryLabelsContext } from "@/contexts/CategoryLabelsContext";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 
 interface SpendingChartProps {
@@ -9,6 +10,7 @@ interface SpendingChartProps {
 
 export function SpendingChart({ expenses }: SpendingChartProps) {
   const { currency } = useCurrency();
+  const { getCategoryConfig } = useCategoryLabelsContext();
 
   const chartData = useMemo(() => {
     const categoryTotals = expenses.reduce((acc, e) => {
@@ -17,14 +19,17 @@ export function SpendingChart({ expenses }: SpendingChartProps) {
     }, {} as Record<ExpenseCategory, number>);
 
     return Object.entries(categoryTotals)
-      .map(([category, amount]) => ({
-        name: categoryConfig[category as ExpenseCategory].label,
-        value: amount,
-        color: categoryConfig[category as ExpenseCategory].color,
-        icon: categoryConfig[category as ExpenseCategory].icon,
-      }))
+      .map(([category, amount]) => {
+        const config = getCategoryConfig(category as ExpenseCategory);
+        return {
+          name: config.label,
+          value: amount,
+          color: config.color,
+          icon: config.icon,
+        };
+      })
       .sort((a, b) => b.value - a.value);
-  }, [expenses]);
+  }, [expenses, getCategoryConfig]);
 
   const total = chartData.reduce((sum, item) => sum + item.value, 0);
 

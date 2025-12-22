@@ -2,8 +2,9 @@ import { useExpenses } from "@/hooks/useExpenses";
 import { SpendingChart } from "@/components/SpendingChart";
 import { SpendingTrends } from "@/components/SpendingTrends";
 import { useCurrency } from "@/contexts/CurrencyContext";
+import { useCategoryLabelsContext } from "@/contexts/CategoryLabelsContext";
 import { formatCurrency } from "@/lib/currencies";
-import { categoryConfig, ExpenseCategory } from "@/lib/types";
+import { ExpenseCategory, categoryConfig } from "@/lib/types";
 import { useMemo } from "react";
 import { startOfMonth, endOfMonth, isWithinInterval, subMonths, format } from "date-fns";
 import { TrendingUp, PieChart, BarChart3, Layers } from "lucide-react";
@@ -20,6 +21,7 @@ import {
 export function AnalyticsPage() {
   const { expenses } = useExpenses();
   const { currency } = useCurrency();
+  const { getCategoryConfig } = useCategoryLabelsContext();
 
   const monthlyData = useMemo(() => {
     const months = [];
@@ -49,13 +51,16 @@ export function AnalyticsPage() {
     });
 
     return Object.entries(breakdown)
-      .map(([category, amount]) => ({
-        category: category as ExpenseCategory,
-        amount,
-        ...categoryConfig[category as ExpenseCategory],
-      }))
+      .map(([category, amount]) => {
+        const config = getCategoryConfig(category as ExpenseCategory);
+        return {
+          category: category as ExpenseCategory,
+          amount,
+          ...config,
+        };
+      })
       .sort((a, b) => b.amount - a.amount);
-  }, [expenses]);
+  }, [expenses, getCategoryConfig]);
 
   const totalSpent = expenses.reduce((sum, e) => sum + Number(e.amount), 0);
   const avgPerExpense = expenses.length > 0 ? totalSpent / expenses.length : 0;
