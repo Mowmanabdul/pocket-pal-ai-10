@@ -1,8 +1,9 @@
-import { Expense, categoryConfig, ExpenseCategory } from "@/lib/types";
+import { Expense, ExpenseCategory } from "@/lib/types";
 import { TrendingUp, TrendingDown, Wallet, Target, Zap, ArrowUpRight, ArrowDownRight } from "lucide-react";
 import { useMemo } from "react";
 import { startOfMonth, endOfMonth, isWithinInterval, subMonths } from "date-fns";
 import { useCurrency } from "@/contexts/CurrencyContext";
+import { useCategoryLabelsContext } from "@/contexts/CategoryLabelsContext";
 import { formatCurrency } from "@/lib/currencies";
 
 interface StatsCardsProps {
@@ -11,6 +12,7 @@ interface StatsCardsProps {
 
 export function StatsCards({ expenses }: StatsCardsProps) {
   const { currency } = useCurrency();
+  const { getCategoryConfig } = useCategoryLabelsContext();
 
   const stats = useMemo(() => {
     const now = new Date();
@@ -120,9 +122,9 @@ export function StatsCards({ expenses }: StatsCardsProps) {
             {stats.topCategory ? (
               <>
                 <div className="flex items-center gap-2 mt-1">
-                  <span className="text-2xl">{categoryConfig[stats.topCategory.category].icon}</span>
+                  <span className="text-2xl">{getCategoryConfig(stats.topCategory.category).icon}</span>
                   <span className="font-bold text-foreground">
-                    {categoryConfig[stats.topCategory.category].label}
+                    {getCategoryConfig(stats.topCategory.category).label}
                   </span>
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">

@@ -1,7 +1,7 @@
 import { format } from "date-fns";
 import { RecurringExpense } from "@/hooks/useRecurringExpenses";
-import { categoryConfig } from "@/lib/types";
 import { useCurrency } from "@/contexts/CurrencyContext";
+import { useCategoryLabelsContext } from "@/contexts/CategoryLabelsContext";
 import { formatCurrency } from "@/lib/currencies";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -42,6 +42,7 @@ export function RecurringExpensesList({
   isToggling 
 }: RecurringExpensesListProps) {
   const { currency } = useCurrency();
+  const { getCategoryConfig } = useCategoryLabelsContext();
 
   if (expenses.length === 0) {
     return (
@@ -60,7 +61,7 @@ export function RecurringExpensesList({
   return (
     <div className="space-y-3">
       {expenses.map((expense) => {
-        const config = categoryConfig[expense.category];
+        const config = getCategoryConfig(expense.category);
         const nextDate = new Date(expense.next_occurrence);
         const isUpcoming = nextDate <= new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 

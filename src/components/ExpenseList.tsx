@@ -1,8 +1,9 @@
-import { Expense, categoryConfig } from "@/lib/types";
+import { Expense } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Trash2, MoreVertical } from "lucide-react";
 import { format } from "date-fns";
 import { useCurrency } from "@/contexts/CurrencyContext";
+import { useCategoryLabelsContext } from "@/contexts/CategoryLabelsContext";
 import { formatCurrency } from "@/lib/currencies";
 import {
   DropdownMenu,
@@ -19,6 +20,7 @@ interface ExpenseListProps {
 
 export function ExpenseList({ expenses, onDelete, isDeleting }: ExpenseListProps) {
   const { currency } = useCurrency();
+  const { getCategoryConfig } = useCategoryLabelsContext();
 
   if (expenses.length === 0) {
     return (
@@ -37,7 +39,7 @@ export function ExpenseList({ expenses, onDelete, isDeleting }: ExpenseListProps
   return (
     <div className="space-y-2 max-h-[500px] overflow-y-auto scrollbar-hide">
       {expenses.map((expense, index) => {
-        const config = categoryConfig[expense.category];
+        const config = getCategoryConfig(expense.category);
         return (
           <div
             key={expense.id}

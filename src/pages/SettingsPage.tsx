@@ -2,6 +2,7 @@ import { useCurrency } from "@/contexts/CurrencyContext";
 import { useTheme, themeConfigs, ThemeColor } from "@/contexts/ThemeContext";
 import { currencies } from "@/lib/currencies";
 import { BudgetSettings } from "@/components/BudgetSettings";
+import { CategoryLabelSettings } from "@/components/CategoryLabelSettings";
 import { Settings as SettingsIcon, Globe, Palette, Bell, Shield, Check, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -137,6 +138,11 @@ export function SettingsPage() {
       {/* Budget Settings */}
       <div className="animate-fade-in" style={{ animationDelay: "125ms" }}>
         <BudgetSettings />
+      </div>
+
+      {/* Category Names */}
+      <div className="animate-fade-in" style={{ animationDelay: "137ms" }}>
+        <CategoryLabelSettings />
       </div>
 
       {/* Coming Soon */}

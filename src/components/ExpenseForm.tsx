@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/select";
 import { ExpenseCategory, categoryConfig } from "@/lib/types";
 import { useCurrency } from "@/contexts/CurrencyContext";
+import { useCategoryLabelsContext } from "@/contexts/CategoryLabelsContext";
 import { Plus, Sparkles } from "lucide-react";
 
 interface ExpenseFormProps {
@@ -28,6 +29,7 @@ const quickAmounts = [10, 25, 50, 100, 250];
 
 export function ExpenseForm({ onSubmit, isLoading }: ExpenseFormProps) {
   const { currency } = useCurrency();
+  const { getCategoryConfig } = useCategoryLabelsContext();
   const [amount, setAmount] = useState("");
   const [category, setCategory] = useState<ExpenseCategory>("other");
   const [description, setDescription] = useState("");
@@ -93,14 +95,17 @@ export function ExpenseForm({ onSubmit, isLoading }: ExpenseFormProps) {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            {Object.entries(categoryConfig).map(([key, { label, icon }]) => (
-              <SelectItem key={key} value={key}>
-                <span className="flex items-center gap-3">
-                  <span className="text-lg">{icon}</span>
-                  <span className="font-medium">{label}</span>
-                </span>
-              </SelectItem>
-            ))}
+            {Object.keys(categoryConfig).map((key) => {
+              const config = getCategoryConfig(key as ExpenseCategory);
+              return (
+                <SelectItem key={key} value={key}>
+                  <span className="flex items-center gap-3">
+                    <span className="text-lg">{config.icon}</span>
+                    <span className="font-medium">{config.label}</span>
+                  </span>
+                </SelectItem>
+              );
+            })}
           </SelectContent>
         </Select>
       </div>

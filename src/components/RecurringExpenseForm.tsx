@@ -5,6 +5,7 @@ import { z } from "zod";
 import { ExpenseCategory, categoryConfig } from "@/lib/types";
 import { RecurringFrequency } from "@/hooks/useRecurringExpenses";
 import { useCurrency } from "@/contexts/CurrencyContext";
+import { useCategoryLabelsContext } from "@/contexts/CategoryLabelsContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -57,6 +58,7 @@ interface RecurringExpenseFormProps {
 
 export function RecurringExpenseForm({ onSubmit, isLoading, onCancel }: RecurringExpenseFormProps) {
   const { currency } = useCurrency();
+  const { getCategoryConfig } = useCategoryLabelsContext();
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -121,14 +123,17 @@ export function RecurringExpenseForm({ onSubmit, isLoading, onCancel }: Recurrin
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {categories.map((cat) => (
-                    <SelectItem key={cat} value={cat}>
-                      <div className="flex items-center gap-2">
-                        <span>{categoryConfig[cat].icon}</span>
-                        <span>{categoryConfig[cat].label}</span>
-                      </div>
-                    </SelectItem>
-                  ))}
+                  {Object.keys(categoryConfig).map((cat) => {
+                    const config = getCategoryConfig(cat as ExpenseCategory);
+                    return (
+                      <SelectItem key={cat} value={cat}>
+                        <div className="flex items-center gap-2">
+                          <span>{config.icon}</span>
+                          <span>{config.label}</span>
+                        </div>
+                      </SelectItem>
+                    );
+                  })}
                 </SelectContent>
               </Select>
               <FormMessage />
