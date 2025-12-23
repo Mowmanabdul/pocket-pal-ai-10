@@ -75,10 +75,15 @@ export function RecurringExpensesList({
             }`}
           >
             <div className="flex items-start gap-3">
-              <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-xl shrink-0 ${
-                expense.is_active ? 'bg-primary/10' : 'bg-muted'
-              }`}>
-                {config.icon}
+              <div 
+                className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${
+                  expense.is_active ? 'bg-primary/10' : 'bg-muted'
+                }`}
+              >
+                <span 
+                  className="w-4 h-4 rounded-full"
+                  style={{ backgroundColor: config.color }}
+                />
               </div>
               
               <div className="flex-1 min-w-0">

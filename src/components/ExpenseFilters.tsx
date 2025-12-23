@@ -45,10 +45,13 @@ export function ExpenseFilters({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Categories</SelectItem>
-            {Object.entries(categoryConfig).map(([key, { label, icon }]) => (
+            {Object.entries(categoryConfig).map(([key, { label, color }]) => (
               <SelectItem key={key} value={key}>
                 <span className="flex items-center gap-2">
-                  <span>{icon}</span>
+                  <span 
+                    className="w-2 h-2 rounded-full" 
+                    style={{ backgroundColor: color }}
+                  />
                   <span>{label}</span>
                 </span>
               </SelectItem>

@@ -94,9 +94,10 @@ export function CategoryLabelSettings() {
               key={category}
               className="flex items-center gap-3 p-3 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors"
             >
-              <div className="flex items-center gap-3 shrink-0">
-                <span className="text-xl">{config.icon}</span>
-              </div>
+              <div 
+                className="w-3 h-3 rounded-full shrink-0"
+                style={{ backgroundColor: config.color }}
+              />
               
               <div className="flex-1 min-w-0">
                 <Input

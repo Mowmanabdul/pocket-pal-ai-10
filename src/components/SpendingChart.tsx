@@ -25,7 +25,6 @@ export function SpendingChart({ expenses }: SpendingChartProps) {
           name: config.label,
           value: amount,
           color: config.color,
-          icon: config.icon,
         };
       })
       .sort((a, b) => b.value - a.value);
@@ -86,7 +85,7 @@ export function SpendingChart({ expenses }: SpendingChartProps) {
               style={{ backgroundColor: item.color }}
             />
             <span className="text-xs text-muted-foreground truncate">
-              {item.icon} {item.name}
+              {item.name}
             </span>
           </div>
         ))}

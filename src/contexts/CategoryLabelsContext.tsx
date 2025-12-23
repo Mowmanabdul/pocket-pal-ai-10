@@ -6,7 +6,7 @@ interface CategoryLabelsContextValue {
   labels: CategoryLabel[];
   isLoading: boolean;
   getCategoryLabel: (category: ExpenseCategory) => string;
-  getCategoryConfig: (category: ExpenseCategory) => { label: string; color: string; icon: string };
+  getCategoryConfig: (category: ExpenseCategory) => { label: string; color: string };
 }
 
 const CategoryLabelsContext = createContext<CategoryLabelsContextValue | undefined>(undefined);

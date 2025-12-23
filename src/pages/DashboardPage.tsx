@@ -36,10 +36,10 @@ export function DashboardPage() {
   return (
     <div className="p-4 md:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 animate-fade-in">
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
         <div>
           <h1 className="text-foreground">
-            {getGreeting()} 👋
+            {getGreeting()}
           </h1>
           <p className="text-muted-foreground mt-1 text-lg">
             You have spent <span className="font-semibold text-foreground">{formatCurrency(totalThisMonth, currency)}</span> this month
@@ -77,7 +77,7 @@ export function DashboardPage() {
       <div className="grid sm:grid-cols-2 gap-4">
         {/* AI Insights Card */}
         <Link to="/ai-advisor" className="group">
-          <div className="glass-card-elevated p-5 cursor-pointer hover:shadow-xl transition-all h-full animate-fade-in" style={{ animationDelay: "400ms" }}>
+          <div className="glass-card-elevated p-5 cursor-pointer hover:shadow-xl transition-shadow h-full">
             <div className="flex items-center gap-4">
               <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-accent to-chart-3 flex items-center justify-center shadow-lg shrink-0">
                 <Sparkles className="w-7 h-7 text-white" />
@@ -86,14 +86,14 @@ export function DashboardPage() {
                 <h3 className="font-bold text-foreground">AI Financial Advisor</h3>
                 <p className="text-sm text-muted-foreground mt-0.5">Get personalized insights & tips</p>
               </div>
-              <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all shrink-0" />
+              <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
             </div>
           </div>
         </Link>
 
         {/* Analytics Card */}
         <Link to="/analytics" className="group">
-          <div className="glass-card-elevated p-5 cursor-pointer hover:shadow-xl transition-all h-full animate-fade-in" style={{ animationDelay: "450ms" }}>
+          <div className="glass-card-elevated p-5 cursor-pointer hover:shadow-xl transition-shadow h-full">
             <div className="flex items-center gap-4">
               <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-chart-5 to-primary flex items-center justify-center shadow-lg shrink-0">
                 <TrendingUp className="w-7 h-7 text-white" />
@@ -102,32 +102,32 @@ export function DashboardPage() {
                 <h3 className="font-bold text-foreground">Analytics</h3>
                 <p className="text-sm text-muted-foreground mt-0.5">Deep dive into your spending</p>
               </div>
-              <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all shrink-0" />
+              <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
             </div>
           </div>
         </Link>
       </div>
 
       {/* Budget Progress */}
-      <div className="animate-fade-in" style={{ animationDelay: "475ms" }}>
+      <div>
         <BudgetProgress expenses={expenses} />
       </div>
 
       {/* Charts Grid */}
       <div className="grid lg:grid-cols-2 gap-4 md:gap-6">
-        <div className="glass-card-elevated p-5 md:p-6 animate-fade-in" style={{ animationDelay: "500ms" }}>
+        <div className="glass-card-elevated p-5 md:p-6">
           <h2 className="text-foreground mb-4">By Category</h2>
           <SpendingChart expenses={expenses} />
         </div>
 
-        <div className="glass-card-elevated p-5 md:p-6 animate-fade-in" style={{ animationDelay: "550ms" }}>
+        <div className="glass-card-elevated p-5 md:p-6">
           <h2 className="text-foreground mb-4">30-Day Trend</h2>
           <SpendingTrends expenses={expenses} />
         </div>
       </div>
 
       {/* Recent Expenses */}
-      <div className="glass-card-elevated p-5 md:p-6 animate-fade-in" style={{ animationDelay: "600ms" }}>
+      <div className="glass-card-elevated p-5 md:p-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-foreground">Recent Expenses</h2>
           {expenses.length > 5 && (

@@ -100,7 +100,10 @@ export function ExpenseForm({ onSubmit, isLoading }: ExpenseFormProps) {
               return (
                 <SelectItem key={key} value={key}>
                   <span className="flex items-center gap-3">
-                    <span className="text-lg">{config.icon}</span>
+                    <span 
+                      className="w-2 h-2 rounded-full" 
+                      style={{ backgroundColor: config.color }}
+                    />
                     <span className="font-medium">{config.label}</span>
                   </span>
                 </SelectItem>

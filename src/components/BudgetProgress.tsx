@@ -132,7 +132,10 @@ export function BudgetProgress({ expenses }: BudgetProgressProps) {
           <div key={item.id} className="space-y-2">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="text-lg">{config.icon}</span>
+                <span 
+                  className="w-3 h-3 rounded-full" 
+                  style={{ backgroundColor: config.color }}
+                />
                 <span className="font-medium text-sm">{config.label}</span>
                 {item.isOverBudget && (
                   <AlertTriangle className="h-4 w-4 text-destructive" />
