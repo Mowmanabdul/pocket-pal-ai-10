@@ -89,7 +89,10 @@ export function BudgetSettings() {
               className="flex items-center gap-3 p-3 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors"
             >
               <div className="flex items-center gap-3 flex-1 min-w-0">
-                <span className="text-xl flex-shrink-0">{config.icon}</span>
+                <span 
+                  className="w-3 h-3 rounded-full flex-shrink-0" 
+                  style={{ backgroundColor: config.color }}
+                />
                 <span className="font-medium text-sm truncate">{config.label}</span>
               </div>
               

@@ -165,10 +165,13 @@ export function AnalyticsPage() {
             {categoryBreakdown.map((item, index) => {
               const percentage = totalSpent > 0 ? (item.amount / totalSpent) * 100 : 0;
               return (
-                <div key={item.category} className="animate-fade-in" style={{ animationDelay: `${index * 40}ms` }}>
+                <div key={item.category}>
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-3">
-                      <span className="text-xl">{item.icon}</span>
+                      <span 
+                        className="w-3 h-3 rounded-full"
+                        style={{ backgroundColor: item.color }}
+                      />
                       <span className="font-semibold text-foreground">{item.label}</span>
                     </div>
                     <div className="text-right">

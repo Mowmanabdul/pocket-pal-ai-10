@@ -43,14 +43,16 @@ export function ExpenseList({ expenses, onDelete, isDeleting }: ExpenseListProps
         return (
           <div
             key={expense.id}
-            className="flex items-center gap-3 p-3 md:p-4 rounded-2xl bg-secondary/50 hover:bg-secondary transition-all group animate-fade-in"
-            style={{ animationDelay: `${index * 30}ms` }}
+            className="flex items-center gap-3 p-3 md:p-4 rounded-2xl bg-secondary/50 hover:bg-secondary transition-colors group"
           >
             <div
-              className="w-11 h-11 md:w-12 md:h-12 rounded-xl flex items-center justify-center text-xl shrink-0 shadow-soft"
-              style={{ backgroundColor: `${config.color}15` }}
+              className="w-11 h-11 md:w-12 md:h-12 rounded-xl flex items-center justify-center shrink-0 shadow-soft"
+              style={{ backgroundColor: `${config.color}25` }}
             >
-              {config.icon}
+              <span 
+                className="w-4 h-4 rounded-full"
+                style={{ backgroundColor: config.color }}
+              />
             </div>
             
             <div className="flex-1 min-w-0">

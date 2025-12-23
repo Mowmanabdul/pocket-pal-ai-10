@@ -1,4 +1,4 @@
-import { LayoutDashboard, Receipt, Sparkles, Settings, TrendingUp, Wallet, LogOut, Home, ChevronLeft, ChevronRight, RefreshCw } from "lucide-react";
+import { Receipt, Sparkles, TrendingUp, Wallet, LogOut, Home, ChevronLeft, ChevronRight, RefreshCw } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,6 @@ const menuItems = [
   { title: "Recurring", url: "/recurring", icon: RefreshCw },
   { title: "Analytics", url: "/analytics", icon: TrendingUp },
   { title: "AI Advisor", url: "/ai-advisor", icon: Sparkles },
-  { title: "Settings", url: "/settings", icon: Settings },
 ];
 
 export function DesktopSidebar() {

@@ -1,4 +1,4 @@
-import { LayoutDashboard, Receipt, Sparkles, Settings, TrendingUp, Home, RefreshCw } from "lucide-react";
+import { Receipt, Sparkles, TrendingUp, Home, RefreshCw } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
@@ -7,7 +7,7 @@ const menuItems = [
   { title: "Expenses", url: "/expenses", icon: Receipt },
   { title: "Recurring", url: "/recurring", icon: RefreshCw },
   { title: "AI", url: "/ai-advisor", icon: Sparkles },
-  { title: "Settings", url: "/settings", icon: Settings },
+  { title: "Analytics", url: "/analytics", icon: TrendingUp },
 ];
 
 export function BottomNav() {

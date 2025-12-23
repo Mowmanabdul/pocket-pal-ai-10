@@ -122,7 +122,10 @@ export function StatsCards({ expenses }: StatsCardsProps) {
             {stats.topCategory ? (
               <>
                 <div className="flex items-center gap-2 mt-1">
-                  <span className="text-2xl">{getCategoryConfig(stats.topCategory.category).icon}</span>
+                  <span 
+                    className="w-4 h-4 rounded-full"
+                    style={{ backgroundColor: getCategoryConfig(stats.topCategory.category).color }}
+                  />
                   <span className="font-bold text-foreground">
                     {getCategoryConfig(stats.topCategory.category).label}
                   </span>

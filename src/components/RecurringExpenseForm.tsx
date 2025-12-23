@@ -128,7 +128,10 @@ export function RecurringExpenseForm({ onSubmit, isLoading, onCancel }: Recurrin
                     return (
                       <SelectItem key={cat} value={cat}>
                         <div className="flex items-center gap-2">
-                          <span>{config.icon}</span>
+                          <span 
+                            className="w-2 h-2 rounded-full"
+                            style={{ backgroundColor: config.color }}
+                          />
                           <span>{config.label}</span>
                         </div>
                       </SelectItem>
