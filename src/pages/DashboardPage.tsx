@@ -3,6 +3,7 @@ import { StatsCards } from "@/components/StatsCards";
 import { SpendingChart } from "@/components/SpendingChart";
 import { SpendingTrends } from "@/components/SpendingTrends";
 import { BudgetProgress } from "@/components/BudgetProgress";
+import { BudgetAlerts } from "@/components/BudgetAlerts";
 import { ExpenseList } from "@/components/ExpenseList";
 import { ExpenseForm } from "@/components/ExpenseForm";
 import { Button } from "@/components/ui/button";
@@ -18,7 +19,6 @@ import {
 } from "@/components/ui/dialog";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { formatCurrency } from "@/lib/currencies";
-
 export function DashboardPage() {
   const { expenses, isLoading, addExpense, deleteExpense } = useExpenses();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -69,6 +69,9 @@ export function DashboardPage() {
           </DialogContent>
         </Dialog>
       </div>
+
+      {/* Budget Alerts */}
+      <BudgetAlerts expenses={expenses} />
 
       {/* Stats Cards */}
       <StatsCards expenses={expenses} />
