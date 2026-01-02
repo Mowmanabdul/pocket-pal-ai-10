@@ -61,7 +61,7 @@ export function StatsCards({ expenses }: StatsCardsProps) {
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
       {/* Total Spending */}
-      <div className="stat-card glass-card-elevated animate-fade-in" style={{ animationDelay: "0ms" }}>
+      <div className="stat-card glass-card-elevated">
         <div className="flex items-start justify-between">
           <div>
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">This Month</p>
@@ -77,7 +77,7 @@ export function StatsCards({ expenses }: StatsCardsProps) {
       </div>
 
       {/* Comparison */}
-      <div className="stat-card glass-card-elevated animate-fade-in" style={{ animationDelay: "100ms" }}>
+      <div className="stat-card glass-card-elevated">
         <div className="flex items-start justify-between">
           <div>
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">vs Last Month</p>
@@ -99,7 +99,7 @@ export function StatsCards({ expenses }: StatsCardsProps) {
       </div>
 
       {/* Daily Average */}
-      <div className="stat-card glass-card-elevated animate-fade-in" style={{ animationDelay: "200ms" }}>
+      <div className="stat-card glass-card-elevated">
         <div className="flex items-start justify-between">
           <div>
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Daily Average</p>
@@ -115,7 +115,7 @@ export function StatsCards({ expenses }: StatsCardsProps) {
       </div>
 
       {/* Top Category */}
-      <div className="stat-card glass-card-elevated animate-fade-in" style={{ animationDelay: "300ms" }}>
+      <div className="stat-card glass-card-elevated">
         <div className="flex items-start justify-between">
           <div>
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Top Category</p>
