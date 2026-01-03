@@ -46,20 +46,20 @@ export function RecurringExpensesList({
 
   if (expenses.length === 0) {
     return (
-      <div className="text-center py-12">
-        <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-4">
-          <RefreshCw className="w-8 h-8 text-muted-foreground" />
+      <div className="text-center py-8">
+        <div className="w-12 h-12 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-3">
+          <RefreshCw className="w-5 h-5 text-muted-foreground" />
         </div>
-        <h3 className="font-semibold text-foreground mb-1">No recurring expenses</h3>
-        <p className="text-sm text-muted-foreground">
-          Set up recurring expenses for bills and subscriptions
+        <h3 className="text-sm font-semibold text-foreground mb-0.5">No recurring expenses</h3>
+        <p className="text-xs text-muted-foreground">
+          Set up recurring expenses for bills
         </p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2">
       {expenses.map((expense) => {
         const config = getCategoryConfig(expense.category);
         const nextDate = new Date(expense.next_occurrence);
@@ -68,70 +68,65 @@ export function RecurringExpensesList({
         return (
           <div
             key={expense.id}
-            className={`p-4 rounded-xl border transition-all ${
+            className={`p-3 rounded-lg border transition-all ${
               expense.is_active 
-                ? 'bg-card/50 border-border/50 hover:shadow-md' 
+                ? 'bg-card/50 border-border/50' 
                 : 'bg-muted/30 border-border/30 opacity-60'
             }`}
           >
-            <div className="flex items-start gap-3">
+            <div className="flex items-start gap-2.5">
               <div 
-                className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${
+                className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
                   expense.is_active ? 'bg-primary/10' : 'bg-muted'
                 }`}
               >
                 <span 
-                  className="w-4 h-4 rounded-full"
+                  className="w-3 h-3 rounded-full"
                   style={{ backgroundColor: config.color }}
                 />
               </div>
               
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="font-semibold text-foreground">
+                <div className="flex items-center gap-1.5 mb-0.5">
+                  <span className="text-sm font-semibold text-foreground">
                     {formatCurrency(expense.amount, currency)}
                   </span>
                   <Badge 
                     variant="secondary" 
-                    className={`text-xs ${
+                    className={`text-[10px] px-1.5 py-0 h-4 ${
                       expense.frequency === 'weekly' 
                         ? 'bg-chart-4/10 text-chart-4' 
                         : 'bg-chart-5/10 text-chart-5'
                     }`}
                   >
-                    {expense.frequency === 'weekly' ? (
-                      <><RefreshCw className="w-3 h-3 mr-1" /> Weekly</>
-                    ) : (
-                      <><Calendar className="w-3 h-3 mr-1" /> Monthly</>
-                    )}
+                    {expense.frequency === 'weekly' ? 'Weekly' : 'Monthly'}
                   </Badge>
                   {!expense.is_active && (
-                    <Badge variant="outline" className="text-xs">
-                      <Pause className="w-3 h-3 mr-1" /> Paused
+                    <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4">
+                      Paused
                     </Badge>
                   )}
                 </div>
                 
-                <p className="text-sm text-muted-foreground truncate">
+                <p className="text-xs text-muted-foreground truncate">
                   {expense.description || config.label}
                 </p>
                 
-                <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
-                  <span className="flex items-center gap-1">
-                    <Clock className="w-3 h-3" />
-                    Next: {format(nextDate, "MMM d, yyyy")}
-                    {isUpcoming && expense.is_active && (
-                      <span className="text-warning font-medium">(soon)</span>
-                    )}
-                  </span>
+                <div className="flex items-center gap-1 mt-1 text-[10px] text-muted-foreground">
+                  <Clock className="w-2.5 h-2.5" />
+                  <span>Next: {format(nextDate, "MMM d")}</span>
+                  {isUpcoming && expense.is_active && (
+                    <span className="text-warning font-medium">(soon)</span>
+                  )}
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 shrink-0">
+              <div className="flex items-center gap-1.5 shrink-0">
                 <Switch
                   checked={expense.is_active}
                   onCheckedChange={(checked) => onToggleActive(expense.id, checked)}
                   disabled={isToggling}
+                  className="scale-90"
                 />
                 
                 <AlertDialog>
@@ -139,16 +134,16 @@ export function RecurringExpensesList({
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-9 w-9 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                      className="h-7 w-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <Trash2 className="w-3.5 h-3.5" />
                     </Button>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader>
-                      <AlertDialogTitle>Delete recurring expense?</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        This will permanently delete this recurring expense. Past expenses created from it will remain.
+                      <AlertDialogTitle className="text-lg">Delete recurring expense?</AlertDialogTitle>
+                      <AlertDialogDescription className="text-sm">
+                        This will permanently delete this recurring expense.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>

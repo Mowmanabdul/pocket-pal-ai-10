@@ -58,34 +58,35 @@ export function ExpensesPage() {
   const totalAmount = filteredExpenses.reduce((sum, e) => sum + Number(e.amount), 0);
 
   return (
-    <div className="p-4 md:p-6 space-y-6 max-w-5xl mx-auto">
+    <div className="p-3 md:p-6 space-y-4 max-w-5xl mx-auto">
       {/* Header */}
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex items-start justify-between gap-3">
         <div className="animate-fade-in">
-          <h1 className="text-2xl md:text-3xl font-bold text-foreground flex items-center gap-3">
-            <Receipt className="w-7 h-7 text-primary" />
-            Expenses
-          </h1>
-          <div className="flex items-center gap-2 mt-2">
-            <span className="px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-semibold">
-              {filteredExpenses.length} items
-            </span>
-            <span className="text-muted-foreground">•</span>
-            <span className="text-muted-foreground font-medium">
-              {formatCurrency(totalAmount, currency)}
-            </span>
+          <div className="flex items-center gap-2">
+            <div className="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+              <Receipt className="w-4 h-4 md:w-5 md:h-5 text-primary" />
+            </div>
+            <div>
+              <h1 className="text-lg md:text-xl font-bold text-foreground">Expenses</h1>
+              <div className="flex items-center gap-1.5 text-xs md:text-sm text-muted-foreground">
+                <span className="font-medium text-primary">{filteredExpenses.length}</span>
+                <span>items</span>
+                <span>•</span>
+                <span className="font-medium text-foreground">{formatCurrency(totalAmount, currency)}</span>
+              </div>
+            </div>
           </div>
         </div>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button className="hidden md:flex bg-gradient-to-r from-primary to-primary/90 text-primary-foreground shadow-glow hover:shadow-lg transition-all rounded-xl">
-              <Plus className="w-4 h-4 mr-2" />
-              Add Expense
+            <Button size="sm" className="hidden md:flex bg-primary text-primary-foreground rounded-lg text-xs h-8">
+              <Plus className="w-3.5 h-3.5 mr-1.5" />
+              Add
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-md rounded-2xl">
             <DialogHeader>
-              <DialogTitle className="text-xl font-bold">Add New Expense</DialogTitle>
+              <DialogTitle className="text-lg font-bold">Add New Expense</DialogTitle>
             </DialogHeader>
             <ExpenseForm
               onSubmit={(expense) => {
@@ -99,7 +100,7 @@ export function ExpensesPage() {
       </div>
 
       {/* Filters & List */}
-      <div className="glass-card-elevated rounded-2xl p-4 md:p-6 space-y-5 animate-fade-in" style={{ animationDelay: "100ms" }}>
+      <div className="glass-card-elevated rounded-xl p-3 md:p-4 space-y-3 animate-fade-in" style={{ animationDelay: "100ms" }}>
         <ExpenseFilters
           search={search}
           onSearchChange={setSearch}
