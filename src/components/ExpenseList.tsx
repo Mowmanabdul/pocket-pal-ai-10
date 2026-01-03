@@ -24,46 +24,46 @@ export function ExpenseList({ expenses, onDelete, isDeleting }: ExpenseListProps
 
   if (expenses.length === 0) {
     return (
-      <div className="text-center py-16">
-        <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center animate-bounce-in">
-          <span className="text-4xl">💸</span>
+      <div className="text-center py-10">
+        <div className="w-14 h-14 mx-auto mb-3 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
+          <span className="text-2xl">💸</span>
         </div>
-        <h3 className="text-lg font-semibold text-foreground">No expenses yet</h3>
-        <p className="text-sm text-muted-foreground mt-1 max-w-xs mx-auto">
-          Start tracking your spending by adding your first expense
+        <h3 className="text-sm font-semibold text-foreground">No expenses yet</h3>
+        <p className="text-xs text-muted-foreground mt-1">
+          Add your first expense to start tracking
         </p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-2 max-h-[500px] overflow-y-auto scrollbar-hide">
+    <div className="space-y-1.5 max-h-[400px] overflow-y-auto scrollbar-hide">
       {expenses.map((expense, index) => {
         const config = getCategoryConfig(expense.category);
         return (
           <div
             key={expense.id}
-            className="flex items-center gap-3 p-3 md:p-4 rounded-2xl bg-secondary/50 hover:bg-secondary transition-colors group"
+            className="flex items-center gap-2.5 p-2.5 md:p-3 rounded-xl bg-secondary/50 hover:bg-secondary transition-colors group"
           >
             <div
-              className="w-11 h-11 md:w-12 md:h-12 rounded-xl flex items-center justify-center shrink-0 shadow-soft"
-              style={{ backgroundColor: `${config.color}25` }}
+              className="w-9 h-9 md:w-10 md:h-10 rounded-lg flex items-center justify-center shrink-0"
+              style={{ backgroundColor: `${config.color}20` }}
             >
               <span 
-                className="w-4 h-4 rounded-full"
+                className="w-3 h-3 rounded-full"
                 style={{ backgroundColor: config.color }}
               />
             </div>
             
             <div className="flex-1 min-w-0">
-              <p className="font-semibold text-foreground truncate">
+              <p className="text-sm font-medium text-foreground truncate">
                 {expense.description || config.label}
               </p>
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <div className="flex items-center gap-1.5 text-[10px] md:text-xs text-muted-foreground">
                 <span>{format(new Date(expense.date), "MMM d")}</span>
-                <span className="w-1 h-1 rounded-full bg-muted-foreground/50" />
+                <span className="w-1 h-1 rounded-full bg-muted-foreground/40" />
                 <span
-                  className="px-2 py-0.5 rounded-full font-medium"
+                  className="px-1.5 py-0.5 rounded-full font-medium"
                   style={{
                     backgroundColor: `${config.color}15`,
                     color: config.color,
@@ -74,8 +74,8 @@ export function ExpenseList({ expenses, onDelete, isDeleting }: ExpenseListProps
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
-              <span className="font-bold text-foreground whitespace-nowrap">
+            <div className="flex items-center gap-1.5">
+              <span className="text-sm font-semibold text-foreground whitespace-nowrap">
                 {formatCurrency(Number(expense.amount), currency)}
               </span>
               

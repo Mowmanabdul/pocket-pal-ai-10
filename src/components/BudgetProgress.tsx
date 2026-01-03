@@ -76,22 +76,22 @@ export function BudgetProgress({ expenses }: BudgetProgressProps) {
   if (budgetItems.length === 0) {
     return (
       <Card className="glass-card">
-        <CardHeader>
-          <CardTitle className="text-base flex items-center gap-2">
-            <Target className="h-5 w-5 text-primary" />
+        <CardHeader className="pb-2 pt-3 px-3">
+          <CardTitle className="text-sm flex items-center gap-1.5">
+            <Target className="h-4 w-4 text-primary" />
             Budget Progress
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="text-center py-6">
-            <div className="w-12 h-12 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-3">
-              <Target className="h-6 w-6 text-muted-foreground" />
+        <CardContent className="px-3 pb-3">
+          <div className="text-center py-4">
+            <div className="w-10 h-10 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-2">
+              <Target className="h-5 w-5 text-muted-foreground" />
             </div>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-xs text-muted-foreground">
               No budgets set yet
             </p>
-            <p className="text-xs text-muted-foreground mt-1">
-              Set monthly limits in Settings
+            <p className="text-[10px] text-muted-foreground mt-0.5">
+              Set limits in Settings
             </p>
           </div>
         </CardContent>
@@ -107,48 +107,48 @@ export function BudgetProgress({ expenses }: BudgetProgressProps) {
 
   return (
     <Card className="glass-card overflow-hidden">
-      <CardHeader className="border-b border-border/50 pb-4">
+      <CardHeader className="border-b border-border/50 pb-3 pt-3 px-3">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-base flex items-center gap-2">
-            <Target className="h-5 w-5 text-primary" />
+          <CardTitle className="text-sm flex items-center gap-1.5">
+            <Target className="h-4 w-4 text-primary" />
             Budget Progress
           </CardTitle>
           <div className="text-right">
-            <p className="text-sm font-semibold">
+            <p className="text-xs font-semibold">
               {format(totalSpent)} <span className="text-muted-foreground font-normal">/ {format(totalBudget)}</span>
             </p>
-            <p className="text-xs text-muted-foreground">{Math.round(overallPercentage)}% used</p>
+            <p className="text-[10px] text-muted-foreground">{Math.round(overallPercentage)}% used</p>
           </div>
         </div>
         <Progress 
           value={Math.min(overallPercentage, 100)} 
-          className="h-2 mt-3"
+          className="h-1.5 mt-2"
         />
       </CardHeader>
-      <CardContent className="p-4 space-y-4">
+      <CardContent className="p-3 space-y-3">
         {budgetItems.map((item) => {
           const config = getCategoryConfig(item.category);
           return (
-          <div key={item.id} className="space-y-2">
+          <div key={item.id} className="space-y-1.5">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5">
                 <span 
-                  className="w-3 h-3 rounded-full" 
+                  className="w-2.5 h-2.5 rounded-full" 
                   style={{ backgroundColor: config.color }}
                 />
-                <span className="font-medium text-sm">{config.label}</span>
+                <span className="font-medium text-xs">{config.label}</span>
                 {item.isOverBudget && (
-                  <AlertTriangle className="h-4 w-4 text-destructive" />
+                  <AlertTriangle className="h-3 w-3 text-destructive" />
                 )}
                 {item.isNearLimit && (
-                  <TrendingUp className="h-4 w-4 text-warning" />
+                  <TrendingUp className="h-3 w-3 text-warning" />
                 )}
                 {item.percentage < 50 && (
-                  <CheckCircle className="h-4 w-4 text-primary" />
+                  <CheckCircle className="h-3 w-3 text-primary" />
                 )}
               </div>
               <div className="text-right">
-                <p className="text-sm font-medium">
+                <p className="text-xs font-medium">
                   {format(item.spent)}
                   <span className="text-muted-foreground font-normal"> / {format(item.amount)}</span>
                 </p>
@@ -157,7 +157,7 @@ export function BudgetProgress({ expenses }: BudgetProgressProps) {
             <div className="relative">
               <Progress 
                 value={item.percentage} 
-                className={`h-2 ${
+                className={`h-1.5 ${
                   item.isOverBudget 
                     ? '[&>div]:bg-destructive' 
                     : item.isNearLimit 
@@ -166,7 +166,7 @@ export function BudgetProgress({ expenses }: BudgetProgressProps) {
                 }`}
               />
             </div>
-            <div className="flex justify-between text-xs text-muted-foreground">
+            <div className="flex justify-between text-[10px] text-muted-foreground">
               <span>{Math.round(item.percentage)}% used</span>
               <span>
                 {item.isOverBudget 
