@@ -157,102 +157,102 @@ export function AnalyticsPage() {
 
   if (isLoading) {
     return (
-      <div className="p-4 md:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto">
-        <div className="h-20 rounded-2xl shimmer" />
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="p-3 md:p-6 lg:p-8 space-y-4 md:space-y-6 max-w-7xl mx-auto">
+        <div className="h-16 md:h-20 rounded-xl shimmer" />
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-4">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="h-28 rounded-2xl shimmer" />
+            <div key={i} className="h-20 md:h-28 rounded-xl shimmer" />
           ))}
         </div>
-        <div className="grid lg:grid-cols-2 gap-6">
-          <div className="h-80 rounded-2xl shimmer" />
-          <div className="h-80 rounded-2xl shimmer" />
+        <div className="grid lg:grid-cols-2 gap-3 md:gap-6">
+          <div className="h-52 md:h-72 rounded-xl shimmer" />
+          <div className="h-52 md:h-72 rounded-xl shimmer" />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="p-4 md:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto">
+    <div className="p-3 md:p-6 lg:p-8 space-y-4 md:space-y-6 max-w-7xl mx-auto">
       {/* Header */}
-      <div className="flex items-center gap-4 mb-2">
-        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-chart-2 to-chart-3 flex items-center justify-center shadow-lg">
-          <Activity className="w-7 h-7 text-white" />
+      <div className="flex items-center gap-3 md:gap-4">
+        <div className="w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl bg-gradient-to-br from-chart-2 to-chart-3 flex items-center justify-center shadow-lg">
+          <Activity className="w-5 h-5 md:w-7 md:h-7 text-white" />
         </div>
         <div>
-          <h1 className="text-foreground">Analytics</h1>
-          <p className="text-muted-foreground">Detailed insights into your spending patterns</p>
+          <h1 className="text-foreground text-lg md:text-2xl">Analytics</h1>
+          <p className="text-muted-foreground text-xs md:text-sm">Insights into your spending</p>
         </div>
       </div>
 
       {/* Key Metrics */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
-        <div className="glass-card-elevated p-4 md:p-5">
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Total Spent</p>
-            <DollarSign className="w-4 h-4 text-primary" />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-4">
+        <div className="glass-card-elevated p-3 md:p-5">
+          <div className="flex items-center justify-between mb-1 md:mb-2">
+            <p className="text-[10px] md:text-xs font-medium text-muted-foreground uppercase tracking-wider">Total Spent</p>
+            <DollarSign className="w-3 h-3 md:w-4 md:h-4 text-primary" />
           </div>
-          <p className="text-2xl md:text-3xl font-bold text-foreground">{formatCurrency(totalSpent, currency)}</p>
-          <p className="text-xs text-muted-foreground mt-1">All time</p>
+          <p className="text-lg md:text-3xl font-bold text-foreground">{formatCurrency(totalSpent, currency)}</p>
+          <p className="text-[10px] md:text-xs text-muted-foreground mt-0.5 md:mt-1">All time</p>
         </div>
 
-        <div className="glass-card-elevated p-4 md:p-5">
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Month Trend</p>
+        <div className="glass-card-elevated p-3 md:p-5">
+          <div className="flex items-center justify-between mb-1 md:mb-2">
+            <p className="text-[10px] md:text-xs font-medium text-muted-foreground uppercase tracking-wider">Month Trend</p>
             {monthChange <= 0 ? (
-              <TrendingDown className="w-4 h-4 text-success" />
+              <TrendingDown className="w-3 h-3 md:w-4 md:h-4 text-success" />
             ) : (
-              <TrendingUp className="w-4 h-4 text-warning" />
+              <TrendingUp className="w-3 h-3 md:w-4 md:h-4 text-warning" />
             )}
           </div>
-          <p className={`text-2xl md:text-3xl font-bold ${monthChange <= 0 ? 'text-success' : 'text-warning'}`}>
+          <p className={`text-lg md:text-3xl font-bold ${monthChange <= 0 ? 'text-success' : 'text-warning'}`}>
             {monthChange >= 0 ? '+' : ''}{monthChange.toFixed(0)}%
           </p>
-          <p className="text-xs text-muted-foreground mt-1">vs last month</p>
+          <p className="text-[10px] md:text-xs text-muted-foreground mt-0.5 md:mt-1">vs last month</p>
         </div>
 
-        <div className="glass-card-elevated p-4 md:p-5">
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Transactions</p>
-            <Calendar className="w-4 h-4 text-chart-2" />
+        <div className="glass-card-elevated p-3 md:p-5">
+          <div className="flex items-center justify-between mb-1 md:mb-2">
+            <p className="text-[10px] md:text-xs font-medium text-muted-foreground uppercase tracking-wider">Transactions</p>
+            <Calendar className="w-3 h-3 md:w-4 md:h-4 text-chart-2" />
           </div>
-          <p className="text-2xl md:text-3xl font-bold text-foreground">{expenses.length}</p>
-          <p className="text-xs text-muted-foreground mt-1">Total count</p>
+          <p className="text-lg md:text-3xl font-bold text-foreground">{expenses.length}</p>
+          <p className="text-[10px] md:text-xs text-muted-foreground mt-0.5 md:mt-1">Total count</p>
         </div>
 
-        <div className="glass-card-elevated p-4 md:p-5">
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Avg Transaction</p>
-            <PieChart className="w-4 h-4 text-chart-3" />
+        <div className="glass-card-elevated p-3 md:p-5">
+          <div className="flex items-center justify-between mb-1 md:mb-2">
+            <p className="text-[10px] md:text-xs font-medium text-muted-foreground uppercase tracking-wider">Avg Transaction</p>
+            <PieChart className="w-3 h-3 md:w-4 md:h-4 text-chart-3" />
           </div>
-          <p className="text-2xl md:text-3xl font-bold text-foreground">{formatCurrency(avgPerExpense, currency)}</p>
-          <p className="text-xs text-muted-foreground mt-1">Per expense</p>
+          <p className="text-lg md:text-3xl font-bold text-foreground">{formatCurrency(avgPerExpense, currency)}</p>
+          <p className="text-[10px] md:text-xs text-muted-foreground mt-0.5 md:mt-1">Per expense</p>
         </div>
       </div>
 
       {/* Insights Panel */}
       {insights.length > 0 && (
-        <div className="glass-card-elevated p-5">
-          <h2 className="text-foreground mb-4 flex items-center gap-2">
-            <Activity className="w-5 h-5 text-primary" />
+        <div className="glass-card-elevated p-3 md:p-5">
+          <h2 className="text-foreground mb-3 md:mb-4 flex items-center gap-2 text-sm md:text-base">
+            <Activity className="w-4 h-4 md:w-5 md:h-5 text-primary" />
             Quick Insights
           </h2>
-          <div className="space-y-3">
+          <div className="space-y-2 md:space-y-3">
             {insights.map((insight, i) => (
               <div 
                 key={i}
-                className={`p-3 rounded-xl flex items-start gap-3 ${
+                className={`p-2 md:p-3 rounded-lg md:rounded-xl flex items-start gap-2 md:gap-3 ${
                   insight.type === 'positive' ? 'bg-success/10 text-success' :
                   insight.type === 'warning' ? 'bg-warning/10 text-warning' :
                   'bg-primary/10 text-primary'
                 }`}
               >
-                <div className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${
+                <div className={`w-1.5 h-1.5 md:w-2 md:h-2 rounded-full mt-1.5 shrink-0 ${
                   insight.type === 'positive' ? 'bg-success' :
                   insight.type === 'warning' ? 'bg-warning' :
                   'bg-primary'
                 }`} />
-                <p className="text-sm font-medium text-foreground">{insight.message}</p>
+                <p className="text-xs md:text-sm font-medium text-foreground">{insight.message}</p>
               </div>
             ))}
           </div>
@@ -260,42 +260,43 @@ export function AnalyticsPage() {
       )}
 
       {/* Charts Grid */}
-      <div className="grid lg:grid-cols-2 gap-4 md:gap-6">
+      <div className="grid lg:grid-cols-2 gap-3 md:gap-6">
         {/* 6-Month Trend - Compact for mobile */}
-        <div className="glass-card-elevated p-4 md:p-6">
-          <h2 className="text-foreground mb-3 text-sm md:text-base">6-Month Trend</h2>
-          <div className="h-[180px] md:h-[220px] -mx-1 md:-mx-2">
+        <div className="glass-card-elevated p-3 md:p-6">
+          <h2 className="text-foreground mb-2 md:mb-3 text-sm md:text-base">6-Month Trend</h2>
+          <div className="h-[160px] md:h-[220px] -mx-1">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={monthlyData} margin={{ top: 5, right: 5, left: -10, bottom: 0 }}>
+              <BarChart data={monthlyData} margin={{ top: 5, right: 5, left: -15, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
                 <XAxis
                   dataKey="month"
                   stroke="hsl(var(--muted-foreground))"
-                  fontSize={10}
+                  fontSize={9}
                   tickLine={false}
                   axisLine={false}
                 />
                 <YAxis
                   stroke="hsl(var(--muted-foreground))"
-                  fontSize={10}
+                  fontSize={9}
                   tickLine={false}
                   axisLine={false}
                   tickFormatter={(value) => value === 0 ? "0" : `${currency.symbol}${value >= 1000 ? `${(value/1000).toFixed(0)}k` : value}`}
-                  width={40}
+                  width={35}
                 />
                 <Tooltip
                   contentStyle={{
                     backgroundColor: "hsl(var(--card))",
                     border: "1px solid hsl(var(--border))",
-                    borderRadius: "12px",
+                    borderRadius: "8px",
                     boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                    fontSize: "12px",
+                    fontSize: "11px",
+                    padding: "6px 10px",
                   }}
                   labelFormatter={(_, payload) => payload?.[0]?.payload?.fullMonth || ""}
                   formatter={(value: number) => [formatCurrency(value, currency), "Spent"]}
                   cursor={{ fill: "hsl(var(--muted) / 0.3)" }}
                 />
-                <Bar dataKey="amount" radius={[4, 4, 0, 0]}>
+                <Bar dataKey="amount" radius={[3, 3, 0, 0]}>
                   {monthlyData.map((entry, index) => (
                     <Cell 
                       key={`cell-${index}`} 
@@ -309,37 +310,37 @@ export function AnalyticsPage() {
         </div>
 
         {/* Category Distribution */}
-        <div className="glass-card-elevated p-4 md:p-6">
-          <h2 className="text-foreground mb-3 text-sm md:text-base">Category Distribution</h2>
+        <div className="glass-card-elevated p-3 md:p-6">
+          <h2 className="text-foreground mb-2 md:mb-3 text-sm md:text-base">Category Distribution</h2>
           <SpendingChart expenses={expenses} />
         </div>
       </div>
 
       {/* Category Breakdown */}
-      <div className="glass-card-elevated p-5 md:p-6">
-        <h2 className="text-foreground mb-5">Detailed Breakdown</h2>
+      <div className="glass-card-elevated p-3 md:p-6">
+        <h2 className="text-foreground mb-3 md:mb-5 text-sm md:text-base">Detailed Breakdown</h2>
         {categoryBreakdown.length === 0 ? (
-          <p className="text-muted-foreground text-center py-8">Add expenses to see breakdown</p>
+          <p className="text-muted-foreground text-center py-6 md:py-8 text-sm">Add expenses to see breakdown</p>
         ) : (
-          <div className="grid sm:grid-cols-2 gap-4">
+          <div className="grid sm:grid-cols-2 gap-2 md:gap-4">
             {categoryBreakdown.map((item) => (
-              <div key={item.category} className="p-4 rounded-xl bg-secondary/30">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-3">
+              <div key={item.category} className="p-3 md:p-4 rounded-lg md:rounded-xl bg-secondary/30">
+                <div className="flex items-center justify-between mb-2 md:mb-3">
+                  <div className="flex items-center gap-2 md:gap-3">
                     <span 
-                      className="w-4 h-4 rounded-full shrink-0"
+                      className="w-3 h-3 md:w-4 md:h-4 rounded-full shrink-0"
                       style={{ backgroundColor: item.color }}
                     />
-                    <span className="font-semibold text-foreground">{item.label}</span>
+                    <span className="font-medium md:font-semibold text-foreground text-sm md:text-base">{item.label}</span>
                   </div>
-                  <span className="text-sm font-medium text-muted-foreground">
+                  <span className="text-xs md:text-sm font-medium text-muted-foreground">
                     {item.percentage.toFixed(1)}%
                   </span>
                 </div>
-                <p className="text-xl font-bold text-foreground mb-2">
+                <p className="text-base md:text-xl font-bold text-foreground mb-1.5 md:mb-2">
                   {formatCurrency(item.amount, currency)}
                 </p>
-                <div className="h-2 bg-secondary rounded-full overflow-hidden">
+                <div className="h-1.5 md:h-2 bg-secondary rounded-full overflow-hidden">
                   <div
                     className="h-full rounded-full"
                     style={{
