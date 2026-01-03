@@ -11,12 +11,10 @@ import {
   isWithinInterval, 
   subMonths, 
   format, 
-  eachDayOfInterval, 
   startOfWeek,
   endOfWeek,
   subWeeks,
-  getDay,
-  getWeek
+  eachDayOfInterval,
 } from "date-fns";
 import { TrendingUp, TrendingDown, Calendar, PieChart, Activity, DollarSign } from "lucide-react";
 import {
@@ -27,9 +25,6 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  LineChart,
-  Line,
-  Legend,
   Cell,
 } from "recharts";
 
@@ -38,8 +33,8 @@ export function AnalyticsPage() {
   const { currency } = useCurrency();
   const { getCategoryConfig } = useCategoryLabelsContext();
 
-  // Weekly comparison data (this week vs last week)
-  const weeklyComparison = useMemo(() => {
+  // Weekly data for insights
+  const weeklyData = useMemo(() => {
     const now = new Date();
     const thisWeekStart = startOfWeek(now, { weekStartsOn: 1 });
     const thisWeekEnd = endOfWeek(now, { weekStartsOn: 1 });
@@ -50,7 +45,6 @@ export function AnalyticsPage() {
     
     return days.map((day, index) => {
       const thisWeekDays = eachDayOfInterval({ start: thisWeekStart, end: thisWeekEnd });
-      const lastWeekDays = eachDayOfInterval({ start: lastWeekStart, end: lastWeekEnd });
       
       const thisWeekTotal = expenses
         .filter(e => {
@@ -60,59 +54,12 @@ export function AnalyticsPage() {
         })
         .reduce((sum, e) => sum + Number(e.amount), 0);
       
-      const lastWeekTotal = expenses
-        .filter(e => {
-          const date = new Date(e.date);
-          return lastWeekDays[index] && 
-            format(date, 'yyyy-MM-dd') === format(lastWeekDays[index], 'yyyy-MM-dd');
-        })
-        .reduce((sum, e) => sum + Number(e.amount), 0);
-      
       return {
         day,
         thisWeek: thisWeekTotal,
-        lastWeek: lastWeekTotal,
       };
     });
   }, [expenses]);
-
-  // Spending heatmap data (last 12 weeks)
-  const heatmapData = useMemo(() => {
-    const weeks: { week: number; days: { day: number; amount: number; date: string }[] }[] = [];
-    
-    for (let w = 11; w >= 0; w--) {
-      const weekStart = startOfWeek(subWeeks(new Date(), w), { weekStartsOn: 1 });
-      const weekEnd = endOfWeek(weekStart, { weekStartsOn: 1 });
-      const daysInWeek = eachDayOfInterval({ start: weekStart, end: weekEnd });
-      
-      const days = daysInWeek.map((d, i) => {
-        const dayTotal = expenses
-          .filter(e => format(new Date(e.date), 'yyyy-MM-dd') === format(d, 'yyyy-MM-dd'))
-          .reduce((sum, e) => sum + Number(e.amount), 0);
-        
-        return {
-          day: i,
-          amount: dayTotal,
-          date: format(d, 'MMM d'),
-        };
-      });
-      
-      weeks.push({ week: getWeek(weekStart), days });
-    }
-    
-    return weeks;
-  }, [expenses]);
-
-  // Get max amount for heatmap intensity
-  const maxHeatmapAmount = useMemo(() => {
-    let max = 0;
-    heatmapData.forEach(week => {
-      week.days.forEach(day => {
-        if (day.amount > max) max = day.amount;
-      });
-    });
-    return max || 1;
-  }, [heatmapData]);
 
   // Monthly data
   const monthlyData = useMemo(() => {
@@ -196,8 +143,8 @@ export function AnalyticsPage() {
       });
     }
 
-    const weekdaySpend = weeklyComparison.slice(0, 5).reduce((sum, d) => sum + d.thisWeek, 0);
-    const weekendSpend = weeklyComparison.slice(5, 7).reduce((sum, d) => sum + d.thisWeek, 0);
+    const weekdaySpend = weeklyData.slice(0, 5).reduce((sum, d) => sum + d.thisWeek, 0);
+    const weekendSpend = weeklyData.slice(5, 7).reduce((sum, d) => sum + d.thisWeek, 0);
     if (weekendSpend > weekdaySpend * 0.5) {
       insights.push({
         type: 'info',
@@ -206,7 +153,7 @@ export function AnalyticsPage() {
     }
 
     return insights;
-  }, [monthChange, categoryBreakdown, weeklyComparison]);
+  }, [monthChange, categoryBreakdown, weeklyData]);
 
   if (isLoading) {
     return (
@@ -312,82 +259,29 @@ export function AnalyticsPage() {
         </div>
       )}
 
-      {/* Spending Heatmap */}
-      <div className="glass-card-elevated p-5 md:p-6">
-        <h2 className="text-foreground mb-4">Spending Heatmap</h2>
-        <p className="text-sm text-muted-foreground mb-4">Last 12 weeks activity</p>
-        <div className="overflow-x-auto">
-          <div className="min-w-[600px]">
-            <div className="flex gap-1 mb-2 text-xs text-muted-foreground ml-8">
-              {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => (
-                <div key={day} className="w-8 text-center">{day}</div>
-              ))}
-            </div>
-            <div className="space-y-1">
-              {heatmapData.map((week, weekIndex) => (
-                <div key={weekIndex} className="flex items-center gap-1">
-                  <div className="w-6 text-xs text-muted-foreground text-right">
-                    {weekIndex === 0 || weekIndex === 6 || weekIndex === 11 ? `W${week.week}` : ''}
-                  </div>
-                  {week.days.map((day, dayIndex) => {
-                    const intensity = day.amount / maxHeatmapAmount;
-                    return (
-                      <div
-                        key={dayIndex}
-                        className="w-8 h-8 rounded-md cursor-pointer transition-transform hover:scale-110"
-                        style={{
-                          backgroundColor: day.amount > 0 
-                            ? `hsl(var(--primary) / ${Math.max(0.15, intensity)})`
-                            : 'hsl(var(--secondary))',
-                        }}
-                        title={`${day.date}: ${formatCurrency(day.amount, currency)}`}
-                      />
-                    );
-                  })}
-                </div>
-              ))}
-            </div>
-            <div className="flex items-center gap-2 mt-4 text-xs text-muted-foreground">
-              <span>Less</span>
-              <div className="flex gap-1">
-                {[0.15, 0.3, 0.5, 0.75, 1].map((opacity, i) => (
-                  <div
-                    key={i}
-                    className="w-4 h-4 rounded-sm"
-                    style={{ backgroundColor: `hsl(var(--primary) / ${opacity})` }}
-                  />
-                ))}
-              </div>
-              <span>More</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Charts Grid */}
       <div className="grid lg:grid-cols-2 gap-4 md:gap-6">
-        {/* Weekly Comparison */}
-        <div className="glass-card-elevated p-5 md:p-6">
-          <h2 className="text-foreground mb-4">Weekly Comparison</h2>
-          <p className="text-sm text-muted-foreground mb-4">This week vs last week</p>
-          <div className="h-[280px] -mx-2">
+        {/* 6-Month Trend - Compact for mobile */}
+        <div className="glass-card-elevated p-4 md:p-6">
+          <h2 className="text-foreground mb-3 text-sm md:text-base">6-Month Trend</h2>
+          <div className="h-[180px] md:h-[220px] -mx-1 md:-mx-2">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={weeklyComparison} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+              <BarChart data={monthlyData} margin={{ top: 5, right: 5, left: -10, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
                 <XAxis
-                  dataKey="day"
+                  dataKey="month"
                   stroke="hsl(var(--muted-foreground))"
-                  fontSize={12}
+                  fontSize={10}
                   tickLine={false}
                   axisLine={false}
                 />
                 <YAxis
                   stroke="hsl(var(--muted-foreground))"
-                  fontSize={12}
+                  fontSize={10}
                   tickLine={false}
                   axisLine={false}
-                  tickFormatter={(value) => `${currency.symbol}${value >= 1000 ? `${(value/1000).toFixed(0)}k` : value}`}
-                  width={50}
+                  tickFormatter={(value) => value === 0 ? "0" : `${currency.symbol}${value >= 1000 ? `${(value/1000).toFixed(0)}k` : value}`}
+                  width={40}
                 />
                 <Tooltip
                   contentStyle={{
@@ -395,67 +289,29 @@ export function AnalyticsPage() {
                     border: "1px solid hsl(var(--border))",
                     borderRadius: "12px",
                     boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                    fontSize: "12px",
                   }}
-                  formatter={(value: number) => [formatCurrency(value, currency)]}
+                  labelFormatter={(_, payload) => payload?.[0]?.payload?.fullMonth || ""}
+                  formatter={(value: number) => [formatCurrency(value, currency), "Spent"]}
+                  cursor={{ fill: "hsl(var(--muted) / 0.3)" }}
                 />
-                <Legend />
-                <Bar dataKey="thisWeek" name="This Week" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="lastWeek" name="Last Week" fill="hsl(var(--muted))" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="amount" radius={[4, 4, 0, 0]}>
+                  {monthlyData.map((entry, index) => (
+                    <Cell 
+                      key={`cell-${index}`} 
+                      fill={index === monthlyData.length - 1 ? 'hsl(var(--primary))' : 'hsl(var(--chart-2))'} 
+                    />
+                  ))}
+                </Bar>
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
 
         {/* Category Distribution */}
-        <div className="glass-card-elevated p-5 md:p-6">
-          <h2 className="text-foreground mb-4">Category Distribution</h2>
+        <div className="glass-card-elevated p-4 md:p-6">
+          <h2 className="text-foreground mb-3 text-sm md:text-base">Category Distribution</h2>
           <SpendingChart expenses={expenses} />
-        </div>
-      </div>
-
-      {/* Monthly Spending Trend */}
-      <div className="glass-card-elevated p-5 md:p-6">
-        <h2 className="text-foreground mb-4">6-Month Trend</h2>
-        <div className="h-[280px] -mx-2">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={monthlyData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
-              <XAxis
-                dataKey="month"
-                stroke="hsl(var(--muted-foreground))"
-                fontSize={12}
-                tickLine={false}
-                axisLine={false}
-              />
-              <YAxis
-                stroke="hsl(var(--muted-foreground))"
-                fontSize={12}
-                tickLine={false}
-                axisLine={false}
-                tickFormatter={(value) => `${currency.symbol}${value >= 1000 ? `${(value/1000).toFixed(0)}k` : value}`}
-                width={50}
-              />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: "hsl(var(--card))",
-                  border: "1px solid hsl(var(--border))",
-                  borderRadius: "12px",
-                  boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                }}
-                labelFormatter={(_, payload) => payload?.[0]?.payload?.fullMonth || ""}
-                formatter={(value: number) => [formatCurrency(value, currency), "Spent"]}
-                cursor={{ fill: "hsl(var(--muted) / 0.3)" }}
-              />
-              <Bar dataKey="amount" radius={[6, 6, 0, 0]}>
-                {monthlyData.map((entry, index) => (
-                  <Cell 
-                    key={`cell-${index}`} 
-                    fill={index === monthlyData.length - 1 ? 'hsl(var(--primary))' : 'hsl(var(--chart-2))'} 
-                  />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
         </div>
       </div>
 
