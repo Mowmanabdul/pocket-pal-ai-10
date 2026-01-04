@@ -34,7 +34,7 @@ export function DashboardPage() {
   };
 
   return (
-    <div className="p-3 md:p-6 space-y-4 max-w-7xl mx-auto">
+    <div className="p-3 md:p-6 space-y-4 max-w-7xl mx-auto min-w-0">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
         <div>
