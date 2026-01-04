@@ -1,18 +1,12 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Sparkles, Send, User, Trash2, AlertCircle } from "lucide-react";
+import { Sparkles, Send, User, Trash2, AlertCircle, Loader2 } from "lucide-react";
 import { Expense } from "@/lib/types";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import ReactMarkdown from "react-markdown";
 import { cn } from "@/lib/utils";
-import { toast } from "sonner";
-
-interface Message {
-  role: "user" | "assistant";
-  content: string;
-  timestamp: Date;
-}
+import { useChatHistory } from "@/hooks/useChatHistory";
 
 interface AIChatPanelProps {
   expenses: Expense[];
@@ -21,23 +15,26 @@ interface AIChatPanelProps {
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-insights`;
 
 const suggestedQuestions = [
-  "How can I reduce my spending?",
-  "What's my biggest expense category?",
-  "Give me personalized saving tips",
-  "Analyze my spending trends",
+  "How can I reduce spending?",
+  "What's my biggest expense?",
+  "Give me saving tips",
+  "Analyze my trends",
 ];
 
 export function AIChatPanel({ expenses }: AIChatPanelProps) {
   const { currency } = useCurrency();
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      role: "assistant",
-      content: "Hi! I'm your **AI financial advisor**. I can help you:\n\n• Analyze your spending patterns\n• Find opportunities to save money\n• Create better budgeting habits\n• Answer questions about your finances\n\nWhat would you like to know?",
-      timestamp: new Date(),
-    },
-  ]);
+  const {
+    messages,
+    isLoading: isLoadingHistory,
+    isInitialized,
+    addMessage,
+    updateLastMessage,
+    saveLastAssistantMessage,
+    clearHistory,
+  } = useChatHistory();
+
   const [input, setInput] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [isStreaming, setIsStreaming] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -54,32 +51,19 @@ export function AIChatPanel({ expenses }: AIChatPanelProps) {
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";
-      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 120)}px`;
+      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 100)}px`;
     }
   }, [input]);
 
-  const clearChat = () => {
-    setMessages([
-      {
-        role: "assistant",
-        content: "Chat cleared! How can I help you today?",
-        timestamp: new Date(),
-      },
-    ]);
-    setError(null);
-    toast.success("Chat history cleared");
-  };
-
   const sendMessage = async (messageText?: string) => {
     const userMessage = (messageText || input).trim();
-    if (!userMessage || isLoading) return;
+    if (!userMessage || isStreaming) return;
 
     setInput("");
     setError(null);
-    
-    const userMsg: Message = { role: "user", content: userMessage, timestamp: new Date() };
-    setMessages((prev) => [...prev, userMsg]);
-    setIsLoading(true);
+
+    await addMessage({ role: "user", content: userMessage });
+    setIsStreaming(true);
 
     try {
       // Build conversation history for context (last 10 messages)
@@ -95,12 +79,20 @@ export function AIChatPanel({ expenses }: AIChatPanelProps) {
         date: e.date,
       }));
 
-      // Calculate some stats for context
+      // Calculate stats for better context
       const totalExpenses = expenses.reduce((sum, e) => sum + Number(e.amount), 0);
       const categoryTotals: Record<string, number> = {};
       expenses.forEach((e) => {
         categoryTotals[e.category] = (categoryTotals[e.category] || 0) + Number(e.amount);
       });
+
+      // Calculate this month's data
+      const now = new Date();
+      const thisMonth = expenses.filter(e => {
+        const d = new Date(e.date);
+        return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+      });
+      const thisMonthTotal = thisMonth.reduce((sum, e) => sum + Number(e.amount), 0);
 
       const response = await fetch(CHAT_URL, {
         method: "POST",
@@ -110,17 +102,20 @@ export function AIChatPanel({ expenses }: AIChatPanelProps) {
         },
         body: JSON.stringify({
           expenses: {
-            message: `CONTEXT:
+            message: `USER'S FINANCIAL DATA:
 - Currency: ${currency.code} (${currency.symbol})
-- Total expenses tracked: ${expenses.length}
-- Total amount spent: ${currency.symbol}${totalExpenses.toFixed(2)}
-- Spending by category: ${JSON.stringify(categoryTotals)}
-- Recent transactions sample: ${JSON.stringify(expenseContext.slice(0, 20))}
+- Total expenses tracked: ${expenses.length} transactions
+- All-time total: ${currency.symbol}${totalExpenses.toFixed(2)}
+- This month's total: ${currency.symbol}${thisMonthTotal.toFixed(2)}
+- Spending by category: ${Object.entries(categoryTotals).map(([k, v]) => `${k}: ${currency.symbol}${v.toFixed(2)}`).join(", ")}
+
+RECENT TRANSACTIONS:
+${expenseContext.slice(0, 15).map(e => `- ${e.date}: ${e.category} - ${currency.symbol}${e.amount} ${e.description ? `(${e.description})` : ""}`).join("\n")}
 
 CONVERSATION HISTORY:
-${conversationHistory.map((m) => `${m.role}: ${m.content}`).join("\n")}
+${conversationHistory.map((m) => `${m.role.toUpperCase()}: ${m.content}`).join("\n\n")}
 
-CURRENT QUESTION: ${userMessage}`,
+USER'S QUESTION: ${userMessage}`,
           },
           type: "chat",
         }),
@@ -128,12 +123,12 @@ CURRENT QUESTION: ${userMessage}`,
 
       if (!response.ok) {
         if (response.status === 429) {
-          throw new Error("Rate limit exceeded. Please wait a moment and try again.");
+          throw new Error("Rate limit reached. Please wait a moment.");
         }
         if (response.status === 402) {
-          throw new Error("AI credits exhausted. Please add credits to continue using the advisor.");
+          throw new Error("AI credits exhausted. Please add credits.");
         }
-        throw new Error("Failed to get response from AI");
+        throw new Error("Failed to get response");
       }
 
       const reader = response.body?.getReader();
@@ -143,7 +138,8 @@ CURRENT QUESTION: ${userMessage}`,
       let textBuffer = "";
       let assistantContent = "";
 
-      setMessages((prev) => [...prev, { role: "assistant", content: "", timestamp: new Date() }]);
+      // Add empty assistant message
+      await addMessage({ role: "assistant", content: "" });
 
       while (true) {
         const { done, value } = await reader.read();
@@ -168,15 +164,7 @@ CURRENT QUESTION: ${userMessage}`,
             const content = parsed.choices?.[0]?.delta?.content;
             if (content) {
               assistantContent += content;
-              setMessages((prev) => {
-                const updated = [...prev];
-                updated[updated.length - 1] = {
-                  role: "assistant",
-                  content: assistantContent,
-                  timestamp: new Date(),
-                };
-                return updated;
-              });
+              updateLastMessage(assistantContent);
             }
           } catch {
             textBuffer = line + "\n" + textBuffer;
@@ -199,35 +187,28 @@ CURRENT QUESTION: ${userMessage}`,
             const content = parsed.choices?.[0]?.delta?.content;
             if (content) {
               assistantContent += content;
-              setMessages((prev) => {
-                const updated = [...prev];
-                updated[updated.length - 1] = {
-                  role: "assistant",
-                  content: assistantContent,
-                  timestamp: new Date(),
-                };
-                return updated;
-              });
+              updateLastMessage(assistantContent);
             }
           } catch {
-            /* ignore partial leftovers */
+            /* ignore */
           }
         }
       }
+
+      // Save the final assistant message
+      if (assistantContent) {
+        await saveLastAssistantMessage(assistantContent);
+      }
     } catch (err) {
       console.error("Error:", err);
-      const errorMessage = err instanceof Error ? err.message : "Something went wrong. Please try again.";
+      const errorMessage = err instanceof Error ? err.message : "Something went wrong.";
       setError(errorMessage);
-      setMessages((prev) => [
-        ...prev,
-        { 
-          role: "assistant", 
-          content: `I apologize, but I encountered an issue: ${errorMessage}`, 
-          timestamp: new Date() 
-        },
-      ]);
+      await addMessage({
+        role: "assistant",
+        content: `Sorry, I encountered an issue: ${errorMessage}`,
+      });
     } finally {
-      setIsLoading(false);
+      setIsStreaming(false);
     }
   };
 
@@ -238,18 +219,27 @@ CURRENT QUESTION: ${userMessage}`,
     }
   };
 
+  if (!isInitialized) {
+    return (
+      <div className="flex flex-col h-[480px] md:h-[520px] items-center justify-center">
+        <Loader2 className="w-6 h-6 animate-spin text-primary" />
+        <p className="text-xs text-muted-foreground mt-2">Loading chat...</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex flex-col h-[520px] md:h-[580px]">
+    <div className="flex flex-col h-[480px] md:h-[520px]">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-card/80">
+      <div className="flex items-center justify-between px-3 py-2.5 border-b border-border bg-card/80">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-            <Sparkles className="w-4 h-4 text-white" />
+          <div className="w-7 h-7 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+            <Sparkles className="w-3.5 h-3.5 text-white" />
           </div>
           <div>
-            <p className="font-semibold text-sm text-foreground">Financial Advisor</p>
-            <p className="text-xs text-success flex items-center gap-1">
-              <span className="w-1.5 h-1.5 bg-success rounded-full" />
+            <p className="font-semibold text-xs text-foreground">Financial Advisor</p>
+            <p className="text-[10px] text-success flex items-center gap-1">
+              <span className="w-1.5 h-1.5 bg-success rounded-full animate-pulse" />
               Online
             </p>
           </div>
@@ -257,21 +247,22 @@ CURRENT QUESTION: ${userMessage}`,
         <Button
           variant="ghost"
           size="sm"
-          onClick={clearChat}
-          className="text-muted-foreground hover:text-destructive"
+          onClick={clearHistory}
+          className="text-muted-foreground hover:text-destructive h-7 w-7 p-0"
+          disabled={isStreaming}
         >
-          <Trash2 className="w-4 h-4" />
+          <Trash2 className="w-3.5 h-3.5" />
         </Button>
       </div>
 
       {/* Error Banner */}
       {error && (
-        <div className="px-4 py-2 bg-destructive/10 border-b border-destructive/20 flex items-center gap-2">
-          <AlertCircle className="w-4 h-4 text-destructive shrink-0" />
-          <p className="text-xs text-destructive">{error}</p>
-          <button 
-            onClick={() => setError(null)} 
-            className="ml-auto text-xs text-destructive hover:underline"
+        <div className="px-3 py-1.5 bg-destructive/10 border-b border-destructive/20 flex items-center gap-2">
+          <AlertCircle className="w-3.5 h-3.5 text-destructive shrink-0" />
+          <p className="text-[10px] text-destructive flex-1">{error}</p>
+          <button
+            onClick={() => setError(null)}
+            className="text-[10px] text-destructive hover:underline"
           >
             Dismiss
           </button>
@@ -279,62 +270,70 @@ CURRENT QUESTION: ${userMessage}`,
       )}
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-hide">
+      <div className="flex-1 overflow-y-auto p-3 space-y-3 scrollbar-hide">
+        {isLoadingHistory && (
+          <div className="flex items-center justify-center py-4">
+            <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
+          </div>
+        )}
+
         {messages.map((msg, index) => (
           <div
             key={index}
             className={cn(
-              "flex gap-3",
+              "flex gap-2",
               msg.role === "user" ? "justify-end" : "justify-start"
             )}
           >
             {msg.role === "assistant" && (
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center shrink-0 shadow-md">
-                <Sparkles className="w-4 h-4 text-white" />
+              <div className="w-6 h-6 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center shrink-0 shadow-sm">
+                <Sparkles className="w-3 h-3 text-white" />
               </div>
             )}
-            <div className="flex flex-col max-w-[80%]">
+            <div className="flex flex-col max-w-[85%]">
               <div
                 className={cn(
-                  "rounded-2xl px-4 py-3",
+                  "rounded-2xl px-3 py-2",
                   msg.role === "user"
                     ? "bg-primary text-primary-foreground rounded-br-md"
                     : "bg-secondary rounded-bl-md"
                 )}
               >
                 {msg.role === "assistant" ? (
-                  <div className="ai-markdown text-sm">
+                  <div className="ai-markdown text-xs leading-relaxed">
                     <ReactMarkdown>{msg.content || "Thinking..."}</ReactMarkdown>
                   </div>
                 ) : (
-                  <p className="text-sm">{msg.content}</p>
+                  <p className="text-xs">{msg.content}</p>
                 )}
               </div>
-              <span className={cn(
-                "text-[10px] text-muted-foreground mt-1 px-1",
-                msg.role === "user" ? "text-right" : "text-left"
-              )}>
-                {msg.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+              <span
+                className={cn(
+                  "text-[9px] text-muted-foreground mt-0.5 px-1",
+                  msg.role === "user" ? "text-right" : "text-left"
+                )}
+              >
+                {msg.created_at.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
               </span>
             </div>
             {msg.role === "user" && (
-              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                <User className="w-4 h-4 text-primary" />
+              <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                <User className="w-3 h-3 text-primary" />
               </div>
             )}
           </div>
         ))}
-        
-        {isLoading && messages[messages.length - 1]?.content === "" && (
-          <div className="flex gap-3">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-md">
-              <Sparkles className="w-4 h-4 text-white" />
+
+        {isStreaming && messages[messages.length - 1]?.content === "" && (
+          <div className="flex gap-2">
+            <div className="w-6 h-6 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-sm">
+              <Sparkles className="w-3 h-3 text-white" />
             </div>
-            <div className="bg-secondary rounded-2xl rounded-bl-md px-4 py-3">
-              <div className="flex gap-1.5">
-                <span className="w-2 h-2 bg-muted-foreground/50 rounded-full animate-bounce" />
-                <span className="w-2 h-2 bg-muted-foreground/50 rounded-full animate-bounce [animation-delay:0.15s]" />
-                <span className="w-2 h-2 bg-muted-foreground/50 rounded-full animate-bounce [animation-delay:0.3s]" />
+            <div className="bg-secondary rounded-2xl rounded-bl-md px-3 py-2">
+              <div className="flex gap-1">
+                <span className="w-1.5 h-1.5 bg-muted-foreground/50 rounded-full animate-bounce" />
+                <span className="w-1.5 h-1.5 bg-muted-foreground/50 rounded-full animate-bounce [animation-delay:0.15s]" />
+                <span className="w-1.5 h-1.5 bg-muted-foreground/50 rounded-full animate-bounce [animation-delay:0.3s]" />
               </div>
             </div>
           </div>
@@ -343,15 +342,15 @@ CURRENT QUESTION: ${userMessage}`,
       </div>
 
       {/* Suggested questions */}
-      {messages.length <= 2 && !isLoading && (
-        <div className="px-4 pb-3">
-          <p className="text-xs text-muted-foreground mb-2 font-medium">Suggestions:</p>
-          <div className="flex flex-wrap gap-2">
+      {messages.length <= 2 && !isStreaming && (
+        <div className="px-3 pb-2">
+          <p className="text-[10px] text-muted-foreground mb-1.5 font-medium">Try asking:</p>
+          <div className="flex flex-wrap gap-1.5">
             {suggestedQuestions.map((q) => (
               <button
                 key={q}
                 onClick={() => sendMessage(q)}
-                className="text-xs px-3 py-2 rounded-xl bg-primary/10 hover:bg-primary/20 text-primary font-medium transition-colors"
+                className="text-[10px] px-2.5 py-1.5 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary font-medium transition-colors"
               >
                 {q}
               </button>
@@ -361,7 +360,7 @@ CURRENT QUESTION: ${userMessage}`,
       )}
 
       {/* Input */}
-      <div className="p-4 border-t border-border bg-card/80">
+      <div className="p-3 border-t border-border bg-card/80">
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -375,21 +374,25 @@ CURRENT QUESTION: ${userMessage}`,
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Ask about your finances..."
-            className="flex-1 min-h-[48px] max-h-[120px] bg-secondary border-0 rounded-xl text-sm resize-none py-3"
-            disabled={isLoading}
+            className="flex-1 min-h-[40px] max-h-[100px] bg-secondary border-0 rounded-xl text-xs resize-none py-2.5 px-3"
+            disabled={isStreaming}
             rows={1}
           />
           <Button
             type="submit"
-            disabled={isLoading || !input.trim()}
+            disabled={isStreaming || !input.trim()}
             size="icon"
-            className="h-12 w-12 rounded-xl bg-primary text-primary-foreground shrink-0 shadow-md hover:shadow-lg transition-shadow"
+            className="h-10 w-10 rounded-xl bg-primary text-primary-foreground shrink-0 shadow-md hover:shadow-lg transition-shadow"
           >
-            <Send className="w-5 h-5" />
+            {isStreaming ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Send className="w-4 h-4" />
+            )}
           </Button>
         </form>
-        <p className="text-[10px] text-muted-foreground text-center mt-2">
-          Press Enter to send, Shift+Enter for new line
+        <p className="text-[9px] text-muted-foreground text-center mt-1.5">
+          Enter to send • Shift+Enter for new line
         </p>
       </div>
     </div>
