@@ -58,7 +58,7 @@ export function ExpensesPage() {
   const totalAmount = filteredExpenses.reduce((sum, e) => sum + Number(e.amount), 0);
 
   return (
-    <div className="p-3 md:p-6 space-y-4 max-w-5xl mx-auto">
+    <div className="p-3 md:p-6 space-y-4 max-w-5xl mx-auto min-w-0">
       {/* Header */}
       <div className="flex items-start justify-between gap-3">
         <div className="animate-fade-in">

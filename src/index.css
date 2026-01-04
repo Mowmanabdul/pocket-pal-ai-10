@@ -320,6 +320,10 @@
     @apply border-border;
   }
 
+  html, body, #root {
+    @apply overflow-x-hidden;
+  }
+
   body {
     @apply bg-background text-foreground antialiased;
     font-family: 'Plus Jakarta Sans', 'DM Sans', system-ui, sans-serif;

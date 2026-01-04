@@ -8,7 +8,7 @@ export function AIAdvisorPage() {
   const { expenses } = useExpenses();
 
   return (
-    <div className="p-3 md:p-6 space-y-4 max-w-4xl mx-auto">
+    <div className="p-3 md:p-6 space-y-4 max-w-4xl mx-auto min-w-0">
       {/* Header */}
       <div className="flex items-center gap-2.5 mb-1">
         <div className="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-gradient-to-br from-accent to-chart-3 flex items-center justify-center">

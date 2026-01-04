@@ -157,23 +157,23 @@ export function AnalyticsPage() {
 
   if (isLoading) {
     return (
-      <div className="p-3 md:p-6 lg:p-8 space-y-4 md:space-y-6 max-w-7xl mx-auto">
-        <div className="h-16 md:h-20 rounded-xl shimmer" />
+      <div className="p-3 md:p-6 lg:p-8 space-y-4 md:space-y-6 max-w-7xl mx-auto min-w-0">
+        <div className="h-14 md:h-20 rounded-xl shimmer" />
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-4">
           {[...Array(4)].map((_, i) => (
             <div key={i} className="h-20 md:h-28 rounded-xl shimmer" />
           ))}
         </div>
         <div className="grid lg:grid-cols-2 gap-3 md:gap-6">
-          <div className="h-52 md:h-72 rounded-xl shimmer" />
-          <div className="h-52 md:h-72 rounded-xl shimmer" />
+          <div className="h-48 md:h-72 rounded-xl shimmer" />
+          <div className="h-48 md:h-72 rounded-xl shimmer" />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="p-3 md:p-6 lg:p-8 space-y-4 md:space-y-6 max-w-7xl mx-auto">
+    <div className="p-3 md:p-6 lg:p-8 space-y-4 md:space-y-6 max-w-7xl mx-auto min-w-0">
       {/* Header */}
       <div className="flex items-center gap-3 md:gap-4">
         <div className="w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl bg-gradient-to-br from-chart-2 to-chart-3 flex items-center justify-center shadow-lg">
@@ -186,47 +186,47 @@ export function AnalyticsPage() {
       </div>
 
       {/* Key Metrics */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-4">
-        <div className="glass-card-elevated p-3 md:p-5">
-          <div className="flex items-center justify-between mb-1 md:mb-2">
-            <p className="text-[10px] md:text-xs font-medium text-muted-foreground uppercase tracking-wider">Total Spent</p>
-            <DollarSign className="w-3 h-3 md:w-4 md:h-4 text-primary" />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-4 min-w-0">
+        <div className="glass-card-elevated p-2.5 md:p-5 min-w-0">
+          <div className="flex items-center justify-between mb-1 md:mb-2 gap-1">
+            <p className="text-[9px] md:text-xs font-medium text-muted-foreground uppercase tracking-wider truncate">Total Spent</p>
+            <DollarSign className="w-3 h-3 md:w-4 md:h-4 text-primary shrink-0" />
           </div>
-          <p className="text-lg md:text-3xl font-bold text-foreground">{formatCurrency(totalSpent, currency)}</p>
-          <p className="text-[10px] md:text-xs text-muted-foreground mt-0.5 md:mt-1">All time</p>
+          <p className="text-base md:text-3xl font-bold text-foreground truncate">{formatCurrency(totalSpent, currency)}</p>
+          <p className="text-[9px] md:text-xs text-muted-foreground mt-0.5 md:mt-1">All time</p>
         </div>
 
-        <div className="glass-card-elevated p-3 md:p-5">
-          <div className="flex items-center justify-between mb-1 md:mb-2">
-            <p className="text-[10px] md:text-xs font-medium text-muted-foreground uppercase tracking-wider">Month Trend</p>
+        <div className="glass-card-elevated p-2.5 md:p-5 min-w-0">
+          <div className="flex items-center justify-between mb-1 md:mb-2 gap-1">
+            <p className="text-[9px] md:text-xs font-medium text-muted-foreground uppercase tracking-wider truncate">Month Trend</p>
             {monthChange <= 0 ? (
-              <TrendingDown className="w-3 h-3 md:w-4 md:h-4 text-success" />
+              <TrendingDown className="w-3 h-3 md:w-4 md:h-4 text-success shrink-0" />
             ) : (
-              <TrendingUp className="w-3 h-3 md:w-4 md:h-4 text-warning" />
+              <TrendingUp className="w-3 h-3 md:w-4 md:h-4 text-warning shrink-0" />
             )}
           </div>
-          <p className={`text-lg md:text-3xl font-bold ${monthChange <= 0 ? 'text-success' : 'text-warning'}`}>
+          <p className={`text-base md:text-3xl font-bold ${monthChange <= 0 ? 'text-success' : 'text-warning'}`}>
             {monthChange >= 0 ? '+' : ''}{monthChange.toFixed(0)}%
           </p>
-          <p className="text-[10px] md:text-xs text-muted-foreground mt-0.5 md:mt-1">vs last month</p>
+          <p className="text-[9px] md:text-xs text-muted-foreground mt-0.5 md:mt-1">vs last month</p>
         </div>
 
-        <div className="glass-card-elevated p-3 md:p-5">
-          <div className="flex items-center justify-between mb-1 md:mb-2">
-            <p className="text-[10px] md:text-xs font-medium text-muted-foreground uppercase tracking-wider">Transactions</p>
-            <Calendar className="w-3 h-3 md:w-4 md:h-4 text-chart-2" />
+        <div className="glass-card-elevated p-2.5 md:p-5 min-w-0">
+          <div className="flex items-center justify-between mb-1 md:mb-2 gap-1">
+            <p className="text-[9px] md:text-xs font-medium text-muted-foreground uppercase tracking-wider truncate">Transactions</p>
+            <Calendar className="w-3 h-3 md:w-4 md:h-4 text-chart-2 shrink-0" />
           </div>
-          <p className="text-lg md:text-3xl font-bold text-foreground">{expenses.length}</p>
-          <p className="text-[10px] md:text-xs text-muted-foreground mt-0.5 md:mt-1">Total count</p>
+          <p className="text-base md:text-3xl font-bold text-foreground">{expenses.length}</p>
+          <p className="text-[9px] md:text-xs text-muted-foreground mt-0.5 md:mt-1">Total count</p>
         </div>
 
-        <div className="glass-card-elevated p-3 md:p-5">
-          <div className="flex items-center justify-between mb-1 md:mb-2">
-            <p className="text-[10px] md:text-xs font-medium text-muted-foreground uppercase tracking-wider">Avg Transaction</p>
-            <PieChart className="w-3 h-3 md:w-4 md:h-4 text-chart-3" />
+        <div className="glass-card-elevated p-2.5 md:p-5 min-w-0">
+          <div className="flex items-center justify-between mb-1 md:mb-2 gap-1">
+            <p className="text-[9px] md:text-xs font-medium text-muted-foreground uppercase tracking-wider truncate">Avg Transaction</p>
+            <PieChart className="w-3 h-3 md:w-4 md:h-4 text-chart-3 shrink-0" />
           </div>
-          <p className="text-lg md:text-3xl font-bold text-foreground">{formatCurrency(avgPerExpense, currency)}</p>
-          <p className="text-[10px] md:text-xs text-muted-foreground mt-0.5 md:mt-1">Per expense</p>
+          <p className="text-base md:text-3xl font-bold text-foreground truncate">{formatCurrency(avgPerExpense, currency)}</p>
+          <p className="text-[9px] md:text-xs text-muted-foreground mt-0.5 md:mt-1">Per expense</p>
         </div>
       </div>
 
@@ -317,30 +317,30 @@ export function AnalyticsPage() {
       </div>
 
       {/* Category Breakdown */}
-      <div className="glass-card-elevated p-3 md:p-6">
+      <div className="glass-card-elevated p-3 md:p-6 min-w-0">
         <h2 className="text-foreground mb-3 md:mb-5 text-sm md:text-base">Detailed Breakdown</h2>
         {categoryBreakdown.length === 0 ? (
           <p className="text-muted-foreground text-center py-6 md:py-8 text-sm">Add expenses to see breakdown</p>
         ) : (
           <div className="grid sm:grid-cols-2 gap-2 md:gap-4">
             {categoryBreakdown.map((item) => (
-              <div key={item.category} className="p-3 md:p-4 rounded-lg md:rounded-xl bg-secondary/30">
-                <div className="flex items-center justify-between mb-2 md:mb-3">
-                  <div className="flex items-center gap-2 md:gap-3">
+              <div key={item.category} className="p-2.5 md:p-4 rounded-lg md:rounded-xl bg-secondary/30 min-w-0">
+                <div className="flex items-center justify-between mb-1.5 md:mb-3 gap-2">
+                  <div className="flex items-center gap-2 md:gap-3 min-w-0 flex-1">
                     <span 
-                      className="w-3 h-3 md:w-4 md:h-4 rounded-full shrink-0"
+                      className="w-2.5 h-2.5 md:w-4 md:h-4 rounded-full shrink-0"
                       style={{ backgroundColor: item.color }}
                     />
-                    <span className="font-medium md:font-semibold text-foreground text-sm md:text-base">{item.label}</span>
+                    <span className="font-medium md:font-semibold text-foreground text-xs md:text-base truncate">{item.label}</span>
                   </div>
-                  <span className="text-xs md:text-sm font-medium text-muted-foreground">
+                  <span className="text-[10px] md:text-sm font-medium text-muted-foreground shrink-0">
                     {item.percentage.toFixed(1)}%
                   </span>
                 </div>
-                <p className="text-base md:text-xl font-bold text-foreground mb-1.5 md:mb-2">
+                <p className="text-sm md:text-xl font-bold text-foreground mb-1 md:mb-2 truncate">
                   {formatCurrency(item.amount, currency)}
                 </p>
-                <div className="h-1.5 md:h-2 bg-secondary rounded-full overflow-hidden">
+                <div className="h-1 md:h-2 bg-secondary rounded-full overflow-hidden">
                   <div
                     className="h-full rounded-full"
                     style={{
