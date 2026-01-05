@@ -2,8 +2,9 @@ import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Sparkles, Send, User, Trash2, AlertCircle, Loader2 } from "lucide-react";
-import { Expense } from "@/lib/types";
+import { Expense, ExpenseCategory } from "@/lib/types";
 import { useCurrency } from "@/contexts/CurrencyContext";
+import { useCategoryLabelsContext } from "@/contexts/CategoryLabelsContext";
 import ReactMarkdown from "react-markdown";
 import { cn } from "@/lib/utils";
 import { useChatHistory } from "@/hooks/useChatHistory";
@@ -14,6 +15,11 @@ interface AIChatPanelProps {
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-insights`;
 
+const categories: ExpenseCategory[] = [
+  'food', 'transport', 'entertainment', 'shopping', 
+  'utilities', 'health', 'education', 'other'
+];
+
 const suggestedQuestions = [
   "How can I reduce spending?",
   "What's my biggest expense?",
@@ -23,6 +29,7 @@ const suggestedQuestions = [
 
 export function AIChatPanel({ expenses }: AIChatPanelProps) {
   const { currency } = useCurrency();
+  const { getCategoryLabel } = useCategoryLabelsContext();
   const {
     messages,
     isLoading: isLoadingHistory,
@@ -75,9 +82,16 @@ export function AIChatPanel({ expenses }: AIChatPanelProps) {
       const expenseContext = expenses.slice(0, 50).map((e) => ({
         amount: e.amount,
         category: e.category,
+        categoryLabel: getCategoryLabel(e.category),
         description: e.description,
         date: e.date,
       }));
+
+      // Build category label mapping
+      const categoryLabels: Record<string, string> = {};
+      categories.forEach(cat => {
+        categoryLabels[cat] = getCategoryLabel(cat);
+      });
 
       // Calculate stats for better context
       const totalExpenses = expenses.reduce((sum, e) => sum + Number(e.amount), 0);
@@ -107,10 +121,10 @@ export function AIChatPanel({ expenses }: AIChatPanelProps) {
 - Total expenses tracked: ${expenses.length} transactions
 - All-time total: ${currency.symbol}${totalExpenses.toFixed(2)}
 - This month's total: ${currency.symbol}${thisMonthTotal.toFixed(2)}
-- Spending by category: ${Object.entries(categoryTotals).map(([k, v]) => `${k}: ${currency.symbol}${v.toFixed(2)}`).join(", ")}
+- Spending by category: ${Object.entries(categoryTotals).map(([k, v]) => `${getCategoryLabel(k as ExpenseCategory)}: ${currency.symbol}${v.toFixed(2)}`).join(", ")}
 
 RECENT TRANSACTIONS:
-${expenseContext.slice(0, 15).map(e => `- ${e.date}: ${e.category} - ${currency.symbol}${e.amount} ${e.description ? `(${e.description})` : ""}`).join("\n")}
+${expenseContext.slice(0, 15).map(e => `- ${e.date}: ${e.categoryLabel} - ${currency.symbol}${e.amount} ${e.description ? `(${e.description})` : ""}`).join("\n")}
 
 CONVERSATION HISTORY:
 ${conversationHistory.map((m) => `${m.role.toUpperCase()}: ${m.content}`).join("\n\n")}
@@ -118,6 +132,7 @@ ${conversationHistory.map((m) => `${m.role.toUpperCase()}: ${m.content}`).join("
 USER'S QUESTION: ${userMessage}`,
           },
           type: "chat",
+          categoryLabels,
         }),
       });
 

@@ -1,21 +1,34 @@
 import { useState } from "react";
-import { Expense } from "@/lib/types";
+import { Expense, ExpenseCategory } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 import { useCurrency } from "@/contexts/CurrencyContext";
+import { useCategoryLabelsContext } from "@/contexts/CategoryLabelsContext";
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-insights`;
+
+const categories: ExpenseCategory[] = [
+  'food', 'transport', 'entertainment', 'shopping', 
+  'utilities', 'health', 'education', 'other'
+];
 
 export function useAIInsights() {
   const [isLoading, setIsLoading] = useState(false);
   const [insights, setInsights] = useState<string>("");
   const { toast } = useToast();
   const { currency } = useCurrency();
+  const { getCategoryLabel } = useCategoryLabelsContext();
 
   const getInsights = async (expenses: Expense[]) => {
     if (expenses.length === 0) {
       setInsights("Add some expenses to get personalized AI insights about your spending habits!");
       return;
     }
+
+    // Build category label mapping
+    const categoryLabels: Record<string, string> = {};
+    categories.forEach(cat => {
+      categoryLabels[cat] = getCategoryLabel(cat);
+    });
 
     setIsLoading(true);
     setInsights("");
@@ -31,6 +44,7 @@ export function useAIInsights() {
           expenses: expenses.slice(0, 50).map((e) => ({
             amount: e.amount,
             category: e.category,
+            categoryLabel: getCategoryLabel(e.category),
             description: e.description,
             date: e.date,
           })),
@@ -40,6 +54,7 @@ export function useAIInsights() {
             symbol: currency.symbol,
             name: currency.name,
           },
+          categoryLabels,
         }),
       });
 
