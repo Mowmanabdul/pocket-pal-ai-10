@@ -6,7 +6,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { categoryConfig } from "@/lib/types";
+import { ExpenseCategory, categoryConfig } from "@/lib/types";
+import { useCategoryLabelsContext } from "@/contexts/CategoryLabelsContext";
 import { Search, SlidersHorizontal } from "lucide-react";
 
 interface ExpenseFiltersProps {
@@ -18,6 +19,11 @@ interface ExpenseFiltersProps {
   onSortChange: (value: string) => void;
 }
 
+const categories: ExpenseCategory[] = [
+  'food', 'transport', 'entertainment', 'shopping', 
+  'utilities', 'health', 'education', 'other'
+];
+
 export function ExpenseFilters({
   search,
   onSearchChange,
@@ -26,6 +32,8 @@ export function ExpenseFilters({
   sortBy,
   onSortChange,
 }: ExpenseFiltersProps) {
+  const { getCategoryConfig } = useCategoryLabelsContext();
+
   return (
     <div className="flex flex-col sm:flex-row gap-2">
       <div className="relative flex-1">
@@ -45,17 +53,20 @@ export function ExpenseFilters({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all" className="text-xs">All</SelectItem>
-            {Object.entries(categoryConfig).map(([key, { label, color }]) => (
-              <SelectItem key={key} value={key} className="text-xs">
-                <span className="flex items-center gap-1.5">
-                  <span 
-                    className="w-2 h-2 rounded-full" 
-                    style={{ backgroundColor: color }}
-                  />
-                  <span>{label}</span>
-                </span>
-              </SelectItem>
-            ))}
+            {categories.map((key) => {
+              const config = getCategoryConfig(key);
+              return (
+                <SelectItem key={key} value={key} className="text-xs">
+                  <span className="flex items-center gap-1.5">
+                    <span 
+                      className="w-2 h-2 rounded-full" 
+                      style={{ backgroundColor: config.color }}
+                    />
+                    <span>{config.label}</span>
+                  </span>
+                </SelectItem>
+              );
+            })}
           </SelectContent>
         </Select>
 
