@@ -11,11 +11,16 @@ serve(async (req) => {
   }
 
   try {
-    const { expenses, type, currency } = await req.json();
+    const { expenses, type, currency, categoryLabels } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
     // Default to USD if no currency provided
     const currencyInfo = currency || { code: "USD", symbol: "$", name: "US Dollar" };
+    
+    // Build category mapping string for AI context
+    const categoryMapping = categoryLabels 
+      ? Object.entries(categoryLabels).map(([key, label]) => `${key} = "${label}"`).join(", ")
+      : "";
     
     if (!LOVABLE_API_KEY) {
       console.error("LOVABLE_API_KEY is not configured");
@@ -29,6 +34,11 @@ serve(async (req) => {
       systemPrompt = `You are an expert financial advisor AI specializing in personal finance analysis. Your goal is to provide insightful, data-driven advice that helps users improve their financial health.
 
 CRITICAL: The user's currency is ${currencyInfo.name} (${currencyInfo.code}). You MUST display ALL monetary amounts using the ${currencyInfo.symbol} symbol. For example: ${currencyInfo.symbol}1,234.56
+
+CRITICAL CATEGORY NAMES: The user has customized their category names. You MUST use ONLY these custom names when referring to categories:
+${categoryMapping}
+
+NEVER use the internal category keys (like "education", "transport", "utilities"). ALWAYS use the user's custom labels (like "Debt", "Black Tax", "Rent") as shown above.
 
 ANALYSIS APPROACH:
 1. First, identify the key patterns in the data
@@ -50,7 +60,9 @@ TONE:
 - Encouraging but honest
 - Personalized to their actual spending`;
       
-      userPrompt = `Analyze these expenses and provide insights. Remember: All amounts are in ${currencyInfo.name} (${currencyInfo.code}) - use the ${currencyInfo.symbol} symbol for all monetary values.
+      userPrompt = `Analyze these expenses and provide insights. Remember: 
+- All amounts are in ${currencyInfo.name} (${currencyInfo.code}) - use the ${currencyInfo.symbol} symbol for all monetary values.
+- Use the categoryLabel field (not category) when referring to expense categories in your response.
 
 Expenses data:
 ${JSON.stringify(expenses, null, 2)}
@@ -76,16 +88,21 @@ Keep under 250 words.`;
     } else if (type === "chat") {
       systemPrompt = `You are an expert AI financial advisor with deep knowledge of personal finance, budgeting, saving strategies, and spending psychology. You have access to the user's actual expense data and use it to provide personalized, actionable advice.
 
+CRITICAL CATEGORY NAMES: The user has customized their category names. You MUST use ONLY these custom names when referring to categories:
+${categoryMapping}
+
+NEVER use internal category keys. ALWAYS use the user's custom labels as shown above.
+
 CORE EXPERTISE:
 - Personal budgeting and expense tracking
 - Identifying spending patterns and opportunities to save
-- Category-specific advice (food, transport, entertainment, etc.)
+- Category-specific advice using the user's custom category names
 - Goal-setting and financial planning
 - Behavioral finance and spending psychology
 
 YOUR APPROACH:
 1. Always reference the user's ACTUAL data when relevant
-2. Be specific with numbers - say "You spent $X on Y" not "You spend a lot on Y"
+2. Be specific with numbers - say "You spent R500 on Shopping" not "You spend a lot on shopping"
 3. Provide actionable next steps, not just observations
 4. Remember the conversation context - build on previous exchanges
 5. If asked something outside finance, briefly acknowledge then redirect
