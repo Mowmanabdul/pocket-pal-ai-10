@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Expense } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
+import { useCurrency } from "@/contexts/CurrencyContext";
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-insights`;
 
@@ -8,6 +9,7 @@ export function useAIInsights() {
   const [isLoading, setIsLoading] = useState(false);
   const [insights, setInsights] = useState<string>("");
   const { toast } = useToast();
+  const { currency } = useCurrency();
 
   const getInsights = async (expenses: Expense[]) => {
     if (expenses.length === 0) {
@@ -33,6 +35,11 @@ export function useAIInsights() {
             date: e.date,
           })),
           type: "insights",
+          currency: {
+            code: currency.code,
+            symbol: currency.symbol,
+            name: currency.name,
+          },
         }),
       });
 

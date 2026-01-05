@@ -11,8 +11,11 @@ serve(async (req) => {
   }
 
   try {
-    const { expenses, type } = await req.json();
+    const { expenses, type, currency } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    
+    // Default to USD if no currency provided
+    const currencyInfo = currency || { code: "USD", symbol: "$", name: "US Dollar" };
     
     if (!LOVABLE_API_KEY) {
       console.error("LOVABLE_API_KEY is not configured");
@@ -24,6 +27,8 @@ serve(async (req) => {
 
     if (type === "insights") {
       systemPrompt = `You are an expert financial advisor AI specializing in personal finance analysis. Your goal is to provide insightful, data-driven advice that helps users improve their financial health.
+
+CRITICAL: The user's currency is ${currencyInfo.name} (${currencyInfo.code}). You MUST display ALL monetary amounts using the ${currencyInfo.symbol} symbol. For example: ${currencyInfo.symbol}1,234.56
 
 ANALYSIS APPROACH:
 1. First, identify the key patterns in the data
@@ -37,6 +42,7 @@ FORMATTING RULES:
 - Keep paragraphs short (2-3 sentences max)
 - Structure with clear ## headings
 - Include specific amounts and percentages
+- ALWAYS format amounts with ${currencyInfo.symbol} prefix (e.g., ${currencyInfo.symbol}500)
 
 TONE:
 - Professional yet warm and approachable
@@ -44,8 +50,9 @@ TONE:
 - Encouraging but honest
 - Personalized to their actual spending`;
       
-      userPrompt = `Analyze these expenses and provide insights:
+      userPrompt = `Analyze these expenses and provide insights. Remember: All amounts are in ${currencyInfo.name} (${currencyInfo.code}) - use the ${currencyInfo.symbol} symbol for all monetary values.
 
+Expenses data:
 ${JSON.stringify(expenses, null, 2)}
 
 Structure your response as:
