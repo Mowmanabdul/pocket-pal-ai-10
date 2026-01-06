@@ -4,7 +4,7 @@ import { useCurrency } from "@/contexts/CurrencyContext";
 import { useCategoryLabelsContext } from "@/contexts/CategoryLabelsContext";
 import { formatCurrency } from "@/lib/currencies";
 import { ExpenseCategory } from "@/lib/types";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { 
   startOfMonth, 
   endOfMonth, 
@@ -20,6 +20,8 @@ import { TrendingUp, TrendingDown, Calendar, PieChart, Activity, DollarSign, Dow
 import { Button } from "@/components/ui/button";
 import { exportToPDF } from "@/lib/pdfExport";
 import { useAIInsights } from "@/hooks/useAIInsights";
+import { DateRangePicker } from "@/components/DateRangePicker";
+import { DateRange } from "react-day-picker";
 import {
   BarChart,
   Bar,
@@ -32,10 +34,24 @@ import {
 } from "recharts";
 
 export function AnalyticsPage() {
-  const { expenses, isLoading } = useExpenses();
+  const { expenses: allExpenses, isLoading } = useExpenses();
   const { currency } = useCurrency();
   const { getCategoryConfig } = useCategoryLabelsContext();
   const { insights: aiInsights } = useAIInsights();
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
+
+  // Filter expenses by date range
+  const expenses = useMemo(() => {
+    if (!dateRange?.from) return allExpenses;
+    
+    return allExpenses.filter((e) => {
+      const expenseDate = new Date(e.date);
+      if (dateRange.to) {
+        return isWithinInterval(expenseDate, { start: dateRange.from!, end: dateRange.to });
+      }
+      return expenseDate >= dateRange.from!;
+    });
+  }, [allExpenses, dateRange]);
 
   const handleExportPDF = () => {
     exportToPDF({
@@ -188,7 +204,7 @@ export function AnalyticsPage() {
   return (
     <div className="p-3 md:p-6 lg:p-8 space-y-4 md:space-y-6 max-w-7xl mx-auto min-w-0">
       {/* Header */}
-      <div className="flex items-center justify-between gap-3 md:gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 md:gap-4">
         <div className="flex items-center gap-3 md:gap-4">
           <div className="w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl bg-gradient-to-br from-chart-2 to-chart-3 flex items-center justify-center shadow-lg">
             <Activity className="w-5 h-5 md:w-7 md:h-7 text-white" />
@@ -198,16 +214,19 @@ export function AnalyticsPage() {
             <p className="text-muted-foreground text-xs md:text-sm">Insights into your spending</p>
           </div>
         </div>
-        <Button 
-          onClick={handleExportPDF} 
-          variant="outline" 
-          size="sm"
-          className="rounded-xl gap-2"
-          disabled={expenses.length === 0}
-        >
-          <Download className="w-4 h-4" />
-          <span className="hidden sm:inline">Export PDF</span>
-        </Button>
+        <div className="flex items-center gap-2">
+          <DateRangePicker dateRange={dateRange} onDateRangeChange={setDateRange} />
+          <Button 
+            onClick={handleExportPDF} 
+            variant="outline" 
+            size="sm"
+            className="rounded-xl gap-2"
+            disabled={expenses.length === 0}
+          >
+            <Download className="w-4 h-4" />
+            <span className="hidden sm:inline">Export PDF</span>
+          </Button>
+        </div>
       </div>
 
       {/* Key Metrics */}
