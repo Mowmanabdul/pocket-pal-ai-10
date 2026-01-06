@@ -16,7 +16,10 @@ import {
   subWeeks,
   eachDayOfInterval,
 } from "date-fns";
-import { TrendingUp, TrendingDown, Calendar, PieChart, Activity, DollarSign } from "lucide-react";
+import { TrendingUp, TrendingDown, Calendar, PieChart, Activity, DollarSign, Download } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { exportToPDF } from "@/lib/pdfExport";
+import { useAIInsights } from "@/hooks/useAIInsights";
 import {
   BarChart,
   Bar,
@@ -32,6 +35,16 @@ export function AnalyticsPage() {
   const { expenses, isLoading } = useExpenses();
   const { currency } = useCurrency();
   const { getCategoryConfig } = useCategoryLabelsContext();
+  const { insights: aiInsights } = useAIInsights();
+
+  const handleExportPDF = () => {
+    exportToPDF({
+      expenses,
+      currency,
+      getCategoryConfig,
+      aiInsights,
+    });
+  };
 
   // Weekly data for insights
   const weeklyData = useMemo(() => {
@@ -175,14 +188,26 @@ export function AnalyticsPage() {
   return (
     <div className="p-3 md:p-6 lg:p-8 space-y-4 md:space-y-6 max-w-7xl mx-auto min-w-0">
       {/* Header */}
-      <div className="flex items-center gap-3 md:gap-4">
-        <div className="w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl bg-gradient-to-br from-chart-2 to-chart-3 flex items-center justify-center shadow-lg">
-          <Activity className="w-5 h-5 md:w-7 md:h-7 text-white" />
+      <div className="flex items-center justify-between gap-3 md:gap-4">
+        <div className="flex items-center gap-3 md:gap-4">
+          <div className="w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl bg-gradient-to-br from-chart-2 to-chart-3 flex items-center justify-center shadow-lg">
+            <Activity className="w-5 h-5 md:w-7 md:h-7 text-white" />
+          </div>
+          <div>
+            <h1 className="text-foreground text-lg md:text-2xl">Analytics</h1>
+            <p className="text-muted-foreground text-xs md:text-sm">Insights into your spending</p>
+          </div>
         </div>
-        <div>
-          <h1 className="text-foreground text-lg md:text-2xl">Analytics</h1>
-          <p className="text-muted-foreground text-xs md:text-sm">Insights into your spending</p>
-        </div>
+        <Button 
+          onClick={handleExportPDF} 
+          variant="outline" 
+          size="sm"
+          className="rounded-xl gap-2"
+          disabled={expenses.length === 0}
+        >
+          <Download className="w-4 h-4" />
+          <span className="hidden sm:inline">Export PDF</span>
+        </Button>
       </div>
 
       {/* Key Metrics */}
