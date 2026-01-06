@@ -1,9 +1,12 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useRecurringExpenses } from "@/hooks/useRecurringExpenses";
 import { RecurringExpenseForm } from "@/components/RecurringExpenseForm";
 import { RecurringExpensesList } from "@/components/RecurringExpensesList";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { DateRangePicker } from "@/components/DateRangePicker";
+import { DateRange } from "react-day-picker";
+import { isWithinInterval } from "date-fns";
 import {
   Dialog,
   DialogContent,
@@ -15,7 +18,7 @@ import { RefreshCw, Plus, Play, Loader2 } from "lucide-react";
 
 export function RecurringPage() {
   const {
-    recurringExpenses,
+    recurringExpenses: allRecurringExpenses,
     isLoading,
     addRecurringExpense,
     deleteRecurringExpense,
@@ -24,6 +27,20 @@ export function RecurringPage() {
   } = useRecurringExpenses();
   
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
+
+  // Filter by next occurrence date
+  const recurringExpenses = useMemo(() => {
+    if (!dateRange?.from) return allRecurringExpenses;
+    
+    return allRecurringExpenses.filter((e) => {
+      const nextDate = new Date(e.next_occurrence);
+      if (dateRange.to) {
+        return isWithinInterval(nextDate, { start: dateRange.from!, end: dateRange.to });
+      }
+      return nextDate >= dateRange.from!;
+    });
+  }, [allRecurringExpenses, dateRange]);
 
   const activeCount = recurringExpenses.filter(e => e.is_active).length;
 
@@ -43,7 +60,8 @@ export function RecurringPage() {
           </div>
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
+          <DateRangePicker dateRange={dateRange} onDateRangeChange={setDateRange} />
           <Button
             variant="outline"
             size="sm"

@@ -3,10 +3,13 @@ import { useExpenses } from "@/hooks/useExpenses";
 import { ExpenseList } from "@/components/ExpenseList";
 import { ExpenseForm } from "@/components/ExpenseForm";
 import { ExpenseFilters } from "@/components/ExpenseFilters";
+import { DateRangePicker } from "@/components/DateRangePicker";
 import { Button } from "@/components/ui/button";
 import { Plus, Receipt } from "lucide-react";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { formatCurrency } from "@/lib/currencies";
+import { DateRange } from "react-day-picker";
+import { isWithinInterval } from "date-fns";
 import {
   Dialog,
   DialogContent,
@@ -22,9 +25,21 @@ export function ExpensesPage() {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all");
   const [sortBy, setSortBy] = useState("date-desc");
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
 
   const filteredExpenses = useMemo(() => {
     let result = [...expenses];
+
+    // Date range filter
+    if (dateRange?.from) {
+      result = result.filter((e) => {
+        const expenseDate = new Date(e.date);
+        if (dateRange.to) {
+          return isWithinInterval(expenseDate, { start: dateRange.from!, end: dateRange.to });
+        }
+        return expenseDate >= dateRange.from!;
+      });
+    }
 
     if (search) {
       const searchLower = search.toLowerCase();
@@ -53,7 +68,7 @@ export function ExpensesPage() {
     });
 
     return result;
-  }, [expenses, search, category, sortBy]);
+  }, [expenses, search, category, sortBy, dateRange]);
 
   const totalAmount = filteredExpenses.reduce((sum, e) => sum + Number(e.amount), 0);
 
@@ -101,14 +116,17 @@ export function ExpensesPage() {
 
       {/* Filters & List */}
       <div className="glass-card-elevated rounded-xl p-3 md:p-4 space-y-3 animate-fade-in" style={{ animationDelay: "100ms" }}>
-        <ExpenseFilters
-          search={search}
-          onSearchChange={setSearch}
-          category={category}
-          onCategoryChange={setCategory}
-          sortBy={sortBy}
-          onSortChange={setSortBy}
-        />
+        <div className="flex flex-col sm:flex-row gap-2 sm:items-center justify-between">
+          <DateRangePicker dateRange={dateRange} onDateRangeChange={setDateRange} />
+          <ExpenseFilters
+            search={search}
+            onSearchChange={setSearch}
+            category={category}
+            onCategoryChange={setCategory}
+            sortBy={sortBy}
+            onSortChange={setSortBy}
+          />
+        </div>
 
         {isLoading ? (
           <div className="space-y-3">
