@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,24 +10,27 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ExpenseCategory, categoryConfig } from "@/lib/types";
+import { ExpenseCategory, categoryConfig, Expense } from "@/lib/types";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { useCategoryLabelsContext } from "@/contexts/CategoryLabelsContext";
-import { Plus, Sparkles } from "lucide-react";
+import { Plus, Save } from "lucide-react";
 
 interface ExpenseFormProps {
   onSubmit: (expense: {
+    id?: string;
     amount: number;
     category: ExpenseCategory;
     description?: string;
     date: string;
   }) => void;
   isLoading?: boolean;
+  expense?: Expense | null;
+  mode?: "add" | "edit";
 }
 
 const quickAmounts = [10, 25, 50, 100, 250];
 
-export function ExpenseForm({ onSubmit, isLoading }: ExpenseFormProps) {
+export function ExpenseForm({ onSubmit, isLoading, expense, mode = "add" }: ExpenseFormProps) {
   const { currency } = useCurrency();
   const { getCategoryConfig } = useCategoryLabelsContext();
   const [amount, setAmount] = useState("");
@@ -35,22 +38,36 @@ export function ExpenseForm({ onSubmit, isLoading }: ExpenseFormProps) {
   const [description, setDescription] = useState("");
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
 
+  useEffect(() => {
+    if (expense && mode === "edit") {
+      setAmount(expense.amount.toString());
+      setCategory(expense.category);
+      setDescription(expense.description || "");
+      setDate(expense.date);
+    }
+  }, [expense, mode]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!amount || parseFloat(amount) <= 0) return;
 
     onSubmit({
+      ...(mode === "edit" && expense ? { id: expense.id } : {}),
       amount: parseFloat(amount),
       category,
       description: description || undefined,
       date,
     });
 
-    setAmount("");
-    setDescription("");
-    setCategory("other");
-    setDate(new Date().toISOString().split("T")[0]);
+    if (mode === "add") {
+      setAmount("");
+      setDescription("");
+      setCategory("other");
+      setDate(new Date().toISOString().split("T")[0]);
+    }
   };
+
+  const isEditMode = mode === "edit";
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
@@ -71,20 +88,22 @@ export function ExpenseForm({ onSubmit, isLoading }: ExpenseFormProps) {
             required
           />
         </div>
-        <div className="flex gap-2 flex-wrap">
-          {quickAmounts.map((qa) => (
-            <Button
-              key={qa}
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => setAmount(qa.toString())}
-              className="rounded-full text-xs font-medium hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all"
-            >
-              {currency.symbol}{qa}
-            </Button>
-          ))}
-        </div>
+        {!isEditMode && (
+          <div className="flex gap-2 flex-wrap">
+            {quickAmounts.map((qa) => (
+              <Button
+                key={qa}
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setAmount(qa.toString())}
+                className="rounded-full text-xs font-medium hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all"
+              >
+                {currency.symbol}{qa}
+              </Button>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Category */}
@@ -144,8 +163,17 @@ export function ExpenseForm({ onSubmit, isLoading }: ExpenseFormProps) {
         disabled={isLoading || !amount}
         className="w-full h-12 rounded-xl bg-gradient-to-r from-primary to-primary/90 text-primary-foreground font-semibold shadow-glow transition-all hover:shadow-lg"
       >
-        <Plus className="w-5 h-5 mr-2" />
-        Add Expense
+        {isEditMode ? (
+          <>
+            <Save className="w-5 h-5 mr-2" />
+            Save Changes
+          </>
+        ) : (
+          <>
+            <Plus className="w-5 h-5 mr-2" />
+            Add Expense
+          </>
+        )}
       </Button>
     </form>
   );

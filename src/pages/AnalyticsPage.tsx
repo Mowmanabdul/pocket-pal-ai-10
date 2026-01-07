@@ -18,7 +18,7 @@ import {
 } from "date-fns";
 import { TrendingUp, TrendingDown, Calendar, PieChart, Activity, DollarSign, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { exportToPDF } from "@/lib/pdfExport";
+import { exportToPDF, exportToCSV } from "@/lib/pdfExport";
 import { useAIInsights } from "@/hooks/useAIInsights";
 import { DateRangePicker } from "@/components/DateRangePicker";
 import { DateRange } from "react-day-picker";
@@ -59,6 +59,14 @@ export function AnalyticsPage() {
       currency,
       getCategoryConfig,
       aiInsights,
+    });
+  };
+
+  const handleExportCSV = () => {
+    exportToCSV({
+      expenses,
+      currency,
+      getCategoryConfig,
     });
   };
 
@@ -217,6 +225,16 @@ export function AnalyticsPage() {
         <div className="flex items-center gap-2">
           <DateRangePicker dateRange={dateRange} onDateRangeChange={setDateRange} />
           <Button 
+            onClick={handleExportCSV} 
+            variant="outline" 
+            size="sm"
+            className="rounded-xl gap-2"
+            disabled={expenses.length === 0}
+          >
+            <Download className="w-4 h-4" />
+            <span className="hidden sm:inline">CSV</span>
+          </Button>
+          <Button 
             onClick={handleExportPDF} 
             variant="outline" 
             size="sm"
@@ -224,7 +242,7 @@ export function AnalyticsPage() {
             disabled={expenses.length === 0}
           >
             <Download className="w-4 h-4" />
-            <span className="hidden sm:inline">Export PDF</span>
+            <span className="hidden sm:inline">PDF</span>
           </Button>
         </div>
       </div>
