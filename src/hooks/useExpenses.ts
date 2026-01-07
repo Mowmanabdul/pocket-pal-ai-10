@@ -55,6 +55,43 @@ export function useExpenses() {
     },
   });
 
+  const updateExpense = useMutation({
+    mutationFn: async ({
+      id,
+      ...expense
+    }: {
+      id: string;
+      amount: number;
+      category: ExpenseCategory;
+      description?: string;
+      date: string;
+    }) => {
+      const { data, error } = await supabase
+        .from("expenses")
+        .update(expense)
+        .eq("id", id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["expenses"] });
+      toast({
+        title: "Expense updated",
+        description: "Your expense has been updated successfully.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
   const deleteExpense = useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase.from("expenses").delete().eq("id", id);
@@ -81,6 +118,7 @@ export function useExpenses() {
     isLoading,
     error,
     addExpense,
+    updateExpense,
     deleteExpense,
   };
 }

@@ -20,7 +20,7 @@ import {
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { formatCurrency } from "@/lib/currencies";
 export function DashboardPage() {
-  const { expenses, isLoading, addExpense, deleteExpense } = useExpenses();
+  const { expenses, isLoading, addExpense, updateExpense, deleteExpense } = useExpenses();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { currency } = useCurrency();
 
@@ -152,7 +152,9 @@ export function DashboardPage() {
           <ExpenseList
             expenses={expenses.slice(0, 5)}
             onDelete={(id) => deleteExpense.mutate(id)}
+            onEdit={(expense) => updateExpense.mutate(expense)}
             isDeleting={deleteExpense.isPending}
+            isUpdating={updateExpense.isPending}
           />
         )}
       </div>

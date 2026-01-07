@@ -169,3 +169,29 @@ export function exportToPDF({ expenses, currency, getCategoryConfig, aiInsights 
   const fileName = `expense-report-${format(new Date(), "yyyy-MM-dd")}.pdf`;
   doc.save(fileName);
 }
+
+export function exportToCSV({ expenses, currency, getCategoryConfig }: Omit<ExportOptions, 'aiInsights'>) {
+  const headers = ["Date", "Category", "Description", "Amount"];
+  
+  const rows = expenses
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    .map((e) => [
+      format(new Date(e.date), "yyyy-MM-dd"),
+      getCategoryConfig(e.category).label,
+      `"${(e.description || "").replace(/"/g, '""')}"`,
+      Number(e.amount).toFixed(2),
+    ]);
+
+  // Add summary rows
+  const totalSpent = expenses.reduce((sum, e) => sum + Number(e.amount), 0);
+  rows.push([], ["Total", "", "", totalSpent.toFixed(2)]);
+
+  const csvContent = [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
+  
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = `expenses-${format(new Date(), "yyyy-MM-dd")}.csv`;
+  link.click();
+  URL.revokeObjectURL(link.href);
+}
