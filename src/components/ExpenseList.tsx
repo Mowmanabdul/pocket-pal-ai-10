@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Expense } from "@/lib/types";
 import { Button } from "@/components/ui/button";
-import { Trash2, MoreVertical, Pencil } from "lucide-react";
+import { Trash2, MoreVertical, Pencil, Copy } from "lucide-react";
 import { format } from "date-fns";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { useCategoryLabelsContext } from "@/contexts/CategoryLabelsContext";
@@ -10,6 +10,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -30,14 +31,32 @@ interface ExpenseListProps {
     description?: string;
     date: string;
   }) => void;
+  onDuplicate?: (expense: {
+    amount: number;
+    category: Expense["category"];
+    description?: string;
+    date: string;
+  }) => void;
   isDeleting?: boolean;
   isUpdating?: boolean;
+  isAdding?: boolean;
 }
 
-export function ExpenseList({ expenses, onDelete, onEdit, isDeleting, isUpdating }: ExpenseListProps) {
+export function ExpenseList({ expenses, onDelete, onEdit, onDuplicate, isDeleting, isUpdating, isAdding }: ExpenseListProps) {
   const { currency } = useCurrency();
   const { getCategoryConfig } = useCategoryLabelsContext();
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
+
+  const handleDuplicate = (expense: Expense) => {
+    if (onDuplicate) {
+      onDuplicate({
+        amount: Number(expense.amount),
+        category: expense.category,
+        description: expense.description || undefined,
+        date: new Date().toISOString().split('T')[0], // Today's date
+      });
+    }
+  };
 
   if (expenses.length === 0) {
     return (
@@ -117,6 +136,16 @@ export function ExpenseList({ expenses, onDelete, onEdit, isDeleting, isUpdating
                         Edit
                       </DropdownMenuItem>
                     )}
+                    {onDuplicate && (
+                      <DropdownMenuItem
+                        onClick={() => handleDuplicate(expense)}
+                        disabled={isAdding}
+                      >
+                        <Copy className="w-4 h-4 mr-2" />
+                        Duplicate
+                      </DropdownMenuItem>
+                    )}
+                    <DropdownMenuSeparator />
                     <DropdownMenuItem
                       onClick={() => onDelete(expense.id)}
                       disabled={isDeleting}

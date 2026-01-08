@@ -153,8 +153,10 @@ export function DashboardPage() {
             expenses={expenses.slice(0, 5)}
             onDelete={(id) => deleteExpense.mutate(id)}
             onEdit={(expense) => updateExpense.mutate(expense)}
+            onDuplicate={(expense) => addExpense.mutate(expense)}
             isDeleting={deleteExpense.isPending}
             isUpdating={updateExpense.isPending}
+            isAdding={addExpense.isPending}
           />
         )}
       </div>
