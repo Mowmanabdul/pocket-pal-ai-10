@@ -92,6 +92,33 @@ export type Database = {
         }
         Relationships: []
       }
+      email_preferences: {
+        Row: {
+          created_at: string
+          email_address: string | null
+          id: string
+          updated_at: string
+          user_id: string
+          weekly_summary_enabled: boolean
+        }
+        Insert: {
+          created_at?: string
+          email_address?: string | null
+          id?: string
+          updated_at?: string
+          user_id: string
+          weekly_summary_enabled?: boolean
+        }
+        Update: {
+          created_at?: string
+          email_address?: string | null
+          id?: string
+          updated_at?: string
+          user_id?: string
+          weekly_summary_enabled?: boolean
+        }
+        Relationships: []
+      }
       expenses: {
         Row: {
           amount: number
