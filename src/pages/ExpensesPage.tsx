@@ -139,8 +139,10 @@ export function ExpensesPage() {
             expenses={filteredExpenses}
             onDelete={(id) => deleteExpense.mutate(id)}
             onEdit={(expense) => updateExpense.mutate(expense)}
+            onDuplicate={(expense) => addExpense.mutate(expense)}
             isDeleting={deleteExpense.isPending}
             isUpdating={updateExpense.isPending}
+            isAdding={addExpense.isPending}
           />
         )}
       </div>
