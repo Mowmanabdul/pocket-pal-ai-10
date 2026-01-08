@@ -3,7 +3,8 @@ import { useTheme, themeConfigs, ThemeColor } from "@/contexts/ThemeContext";
 import { currencies } from "@/lib/currencies";
 import { BudgetSettings } from "@/components/BudgetSettings";
 import { CategoryLabelSettings } from "@/components/CategoryLabelSettings";
-import { Settings as SettingsIcon, Globe, Palette, Bell, Shield, Check, Sparkles } from "lucide-react";
+import { EmailPreferencesSettings } from "@/components/EmailPreferencesSettings";
+import { Settings as SettingsIcon, Globe, Palette, Shield, Check, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
@@ -145,6 +146,11 @@ export function SettingsPage() {
         <CategoryLabelSettings />
       </div>
 
+      {/* Email Preferences */}
+      <div className="animate-fade-in" style={{ animationDelay: "145ms" }}>
+        <EmailPreferencesSettings />
+      </div>
+
       {/* Coming Soon */}
       <div className="space-y-3 animate-fade-in" style={{ animationDelay: "150ms" }}>
         <div className="flex items-center gap-2">
@@ -153,9 +159,8 @@ export function SettingsPage() {
         </div>
 
         {[
-          { icon: Bell, title: "Notifications", desc: "Budget alerts & reminders" },
           { icon: Shield, title: "Privacy & Data", desc: "Export & security" },
-        ].map((item, i) => (
+        ].map((item) => (
           <div
             key={item.title}
             className="glass-card p-3 opacity-60 cursor-not-allowed"
