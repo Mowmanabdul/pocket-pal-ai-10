@@ -80,35 +80,17 @@ export function ExpenseList({ expenses, onDelete, onEdit, onDuplicate, isDeletin
           return (
             <div
               key={expense.id}
-              className="flex items-center gap-2.5 p-2.5 md:p-3 rounded-xl bg-secondary/50 hover:bg-secondary transition-colors group"
+              className="flex items-center gap-3 p-2.5 md:p-3 rounded-xl bg-secondary/30 hover:bg-secondary/50 transition-colors group"
             >
-              <div
-                className="w-9 h-9 md:w-10 md:h-10 rounded-lg flex items-center justify-center shrink-0"
-                style={{ backgroundColor: `${config.color}20` }}
-              >
-                <span 
-                  className="w-3 h-3 rounded-full"
-                  style={{ backgroundColor: config.color }}
-                />
-              </div>
+              <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: config.color }} />
               
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-foreground truncate">
                   {expense.description || config.label}
                 </p>
-                <div className="flex items-center gap-1.5 text-[10px] md:text-xs text-muted-foreground">
-                  <span>{format(new Date(expense.date), "MMM d")}</span>
-                  <span className="w-1 h-1 rounded-full bg-muted-foreground/40" />
-                  <span
-                    className="px-1.5 py-0.5 rounded-full font-medium"
-                    style={{
-                      backgroundColor: `${config.color}15`,
-                      color: config.color,
-                    }}
-                  >
-                    {config.label}
-                  </span>
-                </div>
+                <p className="text-xs text-muted-foreground">
+                  {format(new Date(expense.date), "MMM d")} · {config.label}
+                </p>
               </div>
 
               <div className="flex items-center gap-1.5">
