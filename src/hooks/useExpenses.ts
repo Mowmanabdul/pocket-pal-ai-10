@@ -26,6 +26,7 @@ export function useExpenses() {
       category: ExpenseCategory;
       description?: string;
       date: string;
+      receipt_url?: string | null;
     }) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("User not authenticated");
@@ -65,6 +66,7 @@ export function useExpenses() {
       category: ExpenseCategory;
       description?: string;
       date: string;
+      receipt_url?: string | null;
     }) => {
       const { data, error } = await supabase
         .from("expenses")
