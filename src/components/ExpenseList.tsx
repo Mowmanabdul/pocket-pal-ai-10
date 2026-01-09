@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Expense } from "@/lib/types";
 import { Button } from "@/components/ui/button";
-import { Trash2, MoreVertical, Pencil, Copy } from "lucide-react";
+import { Trash2, MoreVertical, Pencil, Copy, Receipt } from "lucide-react";
 import { format } from "date-fns";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { useCategoryLabelsContext } from "@/contexts/CategoryLabelsContext";
@@ -30,6 +30,7 @@ interface ExpenseListProps {
     category: Expense["category"];
     description?: string;
     date: string;
+    receipt_url?: string | null;
   }) => void;
   onDuplicate?: (expense: {
     amount: number;
@@ -46,6 +47,7 @@ export function ExpenseList({ expenses, onDelete, onEdit, onDuplicate, isDeletin
   const { currency } = useCurrency();
   const { getCategoryConfig } = useCategoryLabelsContext();
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
+  const [viewingReceipt, setViewingReceipt] = useState<string | null>(null);
 
   const handleDuplicate = (expense: Expense) => {
     if (onDuplicate) {
@@ -85,9 +87,21 @@ export function ExpenseList({ expenses, onDelete, onEdit, onDuplicate, isDeletin
               <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: config.color }} />
               
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-foreground truncate">
-                  {expense.description || config.label}
-                </p>
+                <div className="flex items-center gap-1.5">
+                  <p className="text-sm font-medium text-foreground truncate">
+                    {expense.description || config.label}
+                  </p>
+                  {expense.receipt_url && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-5 w-5 shrink-0"
+                      onClick={() => setViewingReceipt(expense.receipt_url)}
+                    >
+                      <Receipt className="w-3 h-3 text-muted-foreground" />
+                    </Button>
+                  )}
+                </div>
                 <p className="text-xs text-muted-foreground">
                   {format(new Date(expense.date), "MMM d")} · {config.label}
                 </p>
@@ -155,12 +169,28 @@ export function ExpenseList({ expenses, onDelete, onEdit, onDuplicate, isDeletin
             mode="edit"
             onSubmit={(data) => {
               if (onEdit && data.id) {
-                onEdit(data as { id: string; amount: number; category: Expense["category"]; description?: string; date: string });
+                onEdit(data as { id: string; amount: number; category: Expense["category"]; description?: string; date: string; receipt_url?: string | null });
               }
               setEditingExpense(null);
             }}
             isLoading={isUpdating}
           />
+        </DialogContent>
+      </Dialog>
+
+      {/* Receipt Viewer Dialog */}
+      <Dialog open={!!viewingReceipt} onOpenChange={(open) => !open && setViewingReceipt(null)}>
+        <DialogContent className="sm:max-w-lg rounded-2xl p-2">
+          <DialogHeader className="p-4 pb-0">
+            <DialogTitle className="text-lg font-bold">Receipt</DialogTitle>
+          </DialogHeader>
+          {viewingReceipt && (
+            <img
+              src={viewingReceipt}
+              alt="Receipt"
+              className="w-full max-h-[70vh] object-contain rounded-lg"
+            />
+          )}
         </DialogContent>
       </Dialog>
     </>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,7 +13,8 @@ import {
 import { ExpenseCategory, categoryConfig, Expense } from "@/lib/types";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { useCategoryLabelsContext } from "@/contexts/CategoryLabelsContext";
-import { Plus, Save } from "lucide-react";
+import { useReceiptUpload } from "@/hooks/useReceiptUpload";
+import { Plus, Save, Camera, X, Loader2 } from "lucide-react";
 
 interface ExpenseFormProps {
   onSubmit: (expense: {
@@ -22,6 +23,7 @@ interface ExpenseFormProps {
     category: ExpenseCategory;
     description?: string;
     date: string;
+    receipt_url?: string | null;
   }) => void;
   isLoading?: boolean;
   expense?: Expense | null;
@@ -33,10 +35,15 @@ const quickAmounts = [10, 25, 50, 100, 250];
 export function ExpenseForm({ onSubmit, isLoading, expense, mode = "add" }: ExpenseFormProps) {
   const { currency } = useCurrency();
   const { getCategoryConfig } = useCategoryLabelsContext();
+  const { uploadReceipt, isUploading } = useReceiptUpload();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  
   const [amount, setAmount] = useState("");
   const [category, setCategory] = useState<ExpenseCategory>("other");
   const [description, setDescription] = useState("");
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
+  const [receiptUrl, setReceiptUrl] = useState<string | null>(null);
+  const [receiptPreview, setReceiptPreview] = useState<string | null>(null);
 
   useEffect(() => {
     if (expense && mode === "edit") {
@@ -44,8 +51,35 @@ export function ExpenseForm({ onSubmit, isLoading, expense, mode = "add" }: Expe
       setCategory(expense.category);
       setDescription(expense.description || "");
       setDate(expense.date);
+      setReceiptUrl(expense.receipt_url || null);
+      setReceiptPreview(expense.receipt_url || null);
     }
   }, [expense, mode]);
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Show preview immediately
+    const previewUrl = URL.createObjectURL(file);
+    setReceiptPreview(previewUrl);
+
+    // Upload file
+    const url = await uploadReceipt(file);
+    if (url) {
+      setReceiptUrl(url);
+    } else {
+      setReceiptPreview(null);
+    }
+  };
+
+  const handleRemoveReceipt = () => {
+    setReceiptUrl(null);
+    setReceiptPreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,6 +91,7 @@ export function ExpenseForm({ onSubmit, isLoading, expense, mode = "add" }: Expe
       category,
       description: description || undefined,
       date,
+      receipt_url: receiptUrl,
     });
 
     if (mode === "add") {
@@ -64,6 +99,11 @@ export function ExpenseForm({ onSubmit, isLoading, expense, mode = "add" }: Expe
       setDescription("");
       setCategory("other");
       setDate(new Date().toISOString().split("T")[0]);
+      setReceiptUrl(null);
+      setReceiptPreview(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
     }
   };
 
@@ -158,9 +198,63 @@ export function ExpenseForm({ onSubmit, isLoading, expense, mode = "add" }: Expe
         </div>
       </div>
 
+      {/* Receipt Upload */}
+      <div className="space-y-2">
+        <Label className="text-sm font-semibold text-foreground">
+          Receipt <span className="font-normal text-muted-foreground">(optional)</span>
+        </Label>
+        
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          onChange={handleFileChange}
+          className="hidden"
+        />
+
+        {receiptPreview ? (
+          <div className="relative w-full h-32 rounded-xl overflow-hidden bg-secondary">
+            <img
+              src={receiptPreview}
+              alt="Receipt preview"
+              className="w-full h-full object-cover"
+            />
+            <Button
+              type="button"
+              variant="secondary"
+              size="icon"
+              onClick={handleRemoveReceipt}
+              className="absolute top-2 right-2 h-8 w-8 rounded-full bg-background/80 backdrop-blur-sm"
+              disabled={isUploading}
+            >
+              {isUploading ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <X className="w-4 h-4" />
+              )}
+            </Button>
+          </div>
+        ) : (
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => fileInputRef.current?.click()}
+            className="w-full h-20 rounded-xl border-dashed border-2 hover:bg-secondary/50"
+            disabled={isUploading}
+          >
+            {isUploading ? (
+              <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+            ) : (
+              <Camera className="w-5 h-5 mr-2" />
+            )}
+            {isUploading ? "Uploading..." : "Add Receipt Photo"}
+          </Button>
+        )}
+      </div>
+
       <Button
         type="submit"
-        disabled={isLoading || !amount}
+        disabled={isLoading || !amount || isUploading}
         className="w-full h-12 rounded-xl bg-gradient-to-r from-primary to-primary/90 text-primary-foreground font-semibold shadow-glow transition-all hover:shadow-lg"
       >
         {isEditMode ? (
