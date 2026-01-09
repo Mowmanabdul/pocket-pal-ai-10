@@ -17,12 +17,22 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { formatCurrency } from "@/lib/currencies";
+import { useIsMobile } from "@/hooks/use-mobile";
+
 export function DashboardPage() {
   const { expenses, isLoading, addExpense, updateExpense, deleteExpense } = useExpenses();
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const { currency } = useCurrency();
+  const isMobile = useIsMobile();
 
   const totalThisMonth = expenses.reduce((sum, e) => sum + Number(e.amount), 0);
 
@@ -32,6 +42,18 @@ export function DashboardPage() {
     if (hour < 18) return "Good afternoon";
     return "Good evening";
   };
+
+  const handleSubmit = (expense: Parameters<typeof addExpense.mutate>[0]) => {
+    addExpense.mutate(expense);
+    setIsOpen(false);
+  };
+
+  const formContent = (
+    <ExpenseForm
+      onSubmit={handleSubmit}
+      isLoading={addExpense.isPending}
+    />
+  );
 
   return (
     <div className="p-3 md:p-6 space-y-4 max-w-7xl mx-auto min-w-0">
@@ -45,11 +67,14 @@ export function DashboardPage() {
             Spent <span className="font-semibold text-foreground">{formatCurrency(totalThisMonth, currency)}</span> this month
           </p>
         </div>
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        
+        {/* Desktop Dialog */}
+        <Dialog open={!isMobile && isOpen} onOpenChange={(open) => !isMobile && setIsOpen(open)}>
           <DialogTrigger asChild>
             <Button 
               size="sm"
               className="hidden sm:flex bg-primary text-primary-foreground rounded-lg h-8 px-4 text-xs font-medium"
+              onClick={() => setIsOpen(true)}
             >
               <Plus className="w-3.5 h-3.5 mr-1.5" />
               Add Expense
@@ -59,13 +84,7 @@ export function DashboardPage() {
             <DialogHeader>
               <DialogTitle className="text-lg font-bold">New Expense</DialogTitle>
             </DialogHeader>
-            <ExpenseForm
-              onSubmit={(expense) => {
-                addExpense.mutate(expense);
-                setIsDialogOpen(false);
-              }}
-              isLoading={addExpense.isPending}
-            />
+            {formContent}
           </DialogContent>
         </Dialog>
       </div>
@@ -161,14 +180,25 @@ export function DashboardPage() {
         )}
       </div>
 
-      {/* Mobile FAB */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogTrigger asChild>
-          <button className="fab-button sm:hidden bottom-24 right-4 shadow-xl">
+      {/* Mobile Drawer */}
+      <Drawer open={isMobile && isOpen} onOpenChange={(open) => isMobile && setIsOpen(open)}>
+        <DrawerTrigger asChild>
+          <button 
+            className="fab-button sm:hidden bottom-24 right-4 shadow-xl"
+            onClick={() => setIsOpen(true)}
+          >
             <Plus className="w-6 h-6 text-primary-foreground" />
           </button>
-        </DialogTrigger>
-      </Dialog>
+        </DrawerTrigger>
+        <DrawerContent className="max-h-[85vh]">
+          <DrawerHeader>
+            <DrawerTitle className="text-lg font-bold">New Expense</DrawerTitle>
+          </DrawerHeader>
+          <div className="px-4 pb-6 overflow-y-auto">
+            {formContent}
+          </div>
+        </DrawerContent>
+      </Drawer>
     </div>
   );
 }
