@@ -17,11 +17,20 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export function ExpensesPage() {
   const { expenses, isLoading, addExpense, updateExpense, deleteExpense } = useExpenses();
   const { currency } = useCurrency();
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const isMobile = useIsMobile();
+  const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all");
   const [sortBy, setSortBy] = useState("date-desc");
@@ -72,6 +81,18 @@ export function ExpensesPage() {
 
   const totalAmount = filteredExpenses.reduce((sum, e) => sum + Number(e.amount), 0);
 
+  const handleSubmit = (expense: Parameters<typeof addExpense.mutate>[0]) => {
+    addExpense.mutate(expense);
+    setIsOpen(false);
+  };
+
+  const formContent = (
+    <ExpenseForm
+      onSubmit={handleSubmit}
+      isLoading={addExpense.isPending}
+    />
+  );
+
   return (
     <div className="p-3 md:p-6 space-y-4 max-w-5xl mx-auto min-w-0">
       {/* Header */}
@@ -92,9 +113,15 @@ export function ExpensesPage() {
             </div>
           </div>
         </div>
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        
+        {/* Desktop Dialog */}
+        <Dialog open={!isMobile && isOpen} onOpenChange={(open) => !isMobile && setIsOpen(open)}>
           <DialogTrigger asChild>
-            <Button size="sm" className="hidden md:flex bg-primary text-primary-foreground rounded-lg text-xs h-8">
+            <Button 
+              size="sm" 
+              className="hidden md:flex bg-primary text-primary-foreground rounded-lg text-xs h-8"
+              onClick={() => setIsOpen(true)}
+            >
               <Plus className="w-3.5 h-3.5 mr-1.5" />
               Add
             </Button>
@@ -103,13 +130,7 @@ export function ExpensesPage() {
             <DialogHeader>
               <DialogTitle className="text-lg font-bold">Add New Expense</DialogTitle>
             </DialogHeader>
-            <ExpenseForm
-              onSubmit={(expense) => {
-                addExpense.mutate(expense);
-                setIsDialogOpen(false);
-              }}
-              isLoading={addExpense.isPending}
-            />
+            {formContent}
           </DialogContent>
         </Dialog>
       </div>
@@ -147,14 +168,25 @@ export function ExpensesPage() {
         )}
       </div>
 
-      {/* Mobile FAB */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogTrigger asChild>
-          <button className="fab-button md:hidden bottom-24 right-4">
+      {/* Mobile Drawer */}
+      <Drawer open={isMobile && isOpen} onOpenChange={(open) => isMobile && setIsOpen(open)}>
+        <DrawerTrigger asChild>
+          <button 
+            className="fab-button md:hidden bottom-24 right-4"
+            onClick={() => setIsOpen(true)}
+          >
             <Plus className="w-6 h-6 text-primary-foreground" />
           </button>
-        </DialogTrigger>
-      </Dialog>
+        </DrawerTrigger>
+        <DrawerContent className="max-h-[85vh]">
+          <DrawerHeader>
+            <DrawerTitle className="text-lg font-bold">Add New Expense</DrawerTitle>
+          </DrawerHeader>
+          <div className="px-4 pb-6 overflow-y-auto">
+            {formContent}
+          </div>
+        </DrawerContent>
+      </Drawer>
     </div>
   );
 }
