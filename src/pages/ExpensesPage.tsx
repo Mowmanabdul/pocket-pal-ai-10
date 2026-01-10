@@ -4,8 +4,9 @@ import { ExpenseList } from "@/components/ExpenseList";
 import { ExpenseForm } from "@/components/ExpenseForm";
 import { ExpenseFilters } from "@/components/ExpenseFilters";
 import { DateRangePicker } from "@/components/DateRangePicker";
+import { CSVImportDialog } from "@/components/CSVImportDialog";
 import { Button } from "@/components/ui/button";
-import { Plus, Receipt } from "lucide-react";
+import { Plus, Receipt, Upload } from "lucide-react";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { formatCurrency } from "@/lib/currencies";
 import { DateRange } from "react-day-picker";
@@ -31,6 +32,7 @@ export function ExpensesPage() {
   const { currency } = useCurrency();
   const isMobile = useIsMobile();
   const [isOpen, setIsOpen] = useState(false);
+  const [isImportOpen, setIsImportOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all");
   const [sortBy, setSortBy] = useState("date-desc");
@@ -114,26 +116,40 @@ export function ExpensesPage() {
           </div>
         </div>
         
-        {/* Desktop Dialog */}
-        <Dialog open={!isMobile && isOpen} onOpenChange={(open) => !isMobile && setIsOpen(open)}>
-          <DialogTrigger asChild>
-            <Button 
-              size="sm" 
-              className="hidden md:flex bg-primary text-primary-foreground rounded-lg text-xs h-8"
-              onClick={() => setIsOpen(true)}
-            >
-              <Plus className="w-3.5 h-3.5 mr-1.5" />
-              Add
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-md rounded-2xl">
-            <DialogHeader>
-              <DialogTitle className="text-lg font-bold">Add New Expense</DialogTitle>
-            </DialogHeader>
-            {formContent}
-          </DialogContent>
-        </Dialog>
+        {/* Desktop Actions */}
+        <div className="hidden md:flex items-center gap-2">
+          <Button 
+            size="sm" 
+            variant="outline"
+            className="rounded-lg text-xs h-8"
+            onClick={() => setIsImportOpen(true)}
+          >
+            <Upload className="w-3.5 h-3.5 mr-1.5" />
+            Import CSV
+          </Button>
+          <Dialog open={!isMobile && isOpen} onOpenChange={(open) => !isMobile && setIsOpen(open)}>
+            <DialogTrigger asChild>
+              <Button 
+                size="sm" 
+                className="bg-primary text-primary-foreground rounded-lg text-xs h-8"
+                onClick={() => setIsOpen(true)}
+              >
+                <Plus className="w-3.5 h-3.5 mr-1.5" />
+                Add
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-md rounded-2xl">
+              <DialogHeader>
+                <DialogTitle className="text-lg font-bold">Add New Expense</DialogTitle>
+              </DialogHeader>
+              {formContent}
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
+
+      {/* CSV Import Dialog */}
+      <CSVImportDialog open={isImportOpen} onOpenChange={setIsImportOpen} />
 
       {/* Filters & List */}
       <div className="glass-card-elevated rounded-xl p-3 md:p-4 space-y-3 animate-fade-in" style={{ animationDelay: "100ms" }}>
