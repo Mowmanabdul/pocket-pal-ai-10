@@ -22,6 +22,7 @@ import { exportToPDF, exportToCSV } from "@/lib/pdfExport";
 import { useAIInsights } from "@/hooks/useAIInsights";
 import { DateRangePicker } from "@/components/DateRangePicker";
 import { DateRange } from "react-day-picker";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   BarChart,
   Bar,
@@ -39,19 +40,57 @@ export function AnalyticsPage() {
   const { getCategoryConfig } = useCategoryLabelsContext();
   const { insights: aiInsights } = useAIInsights();
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
+  const [selectedMonth, setSelectedMonth] = useState<string>("all");
 
-  // Filter expenses by date range
+  // Generate last 6 months for tabs
+  const monthOptions = useMemo(() => {
+    const months = [{ value: "all", label: "All Time" }];
+    for (let i = 0; i < 6; i++) {
+      const date = subMonths(new Date(), i);
+      months.push({
+        value: format(date, "yyyy-MM"),
+        label: format(date, "MMM yyyy"),
+      });
+    }
+    return months;
+  }, []);
+
+  // Filter expenses by selected month or date range
   const expenses = useMemo(() => {
-    if (!dateRange?.from) return allExpenses;
-    
-    return allExpenses.filter((e) => {
-      const expenseDate = new Date(e.date);
-      if (dateRange.to) {
-        return isWithinInterval(expenseDate, { start: dateRange.from!, end: dateRange.to });
-      }
-      return expenseDate >= dateRange.from!;
-    });
-  }, [allExpenses, dateRange]);
+    let filtered = allExpenses;
+
+    // Apply month filter first
+    if (selectedMonth !== "all") {
+      const [year, month] = selectedMonth.split("-").map(Number);
+      const monthStart = startOfMonth(new Date(year, month - 1));
+      const monthEnd = endOfMonth(new Date(year, month - 1));
+      filtered = filtered.filter((e) => {
+        const expenseDate = new Date(e.date);
+        return isWithinInterval(expenseDate, { start: monthStart, end: monthEnd });
+      });
+    }
+
+    // Then apply custom date range if set
+    if (dateRange?.from) {
+      filtered = filtered.filter((e) => {
+        const expenseDate = new Date(e.date);
+        if (dateRange.to) {
+          return isWithinInterval(expenseDate, { start: dateRange.from!, end: dateRange.to });
+        }
+        return expenseDate >= dateRange.from!;
+      });
+    }
+
+    return filtered;
+  }, [allExpenses, dateRange, selectedMonth]);
+
+  const handleMonthChange = (value: string) => {
+    setSelectedMonth(value);
+    // Clear custom date range when selecting a month
+    if (value !== "all") {
+      setDateRange(undefined);
+    }
+  };
 
   const handleExportPDF = () => {
     exportToPDF({
@@ -212,39 +251,56 @@ export function AnalyticsPage() {
   return (
     <div className="p-3 md:p-6 lg:p-8 space-y-4 md:space-y-6 max-w-7xl mx-auto min-w-0">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 md:gap-4">
-        <div className="flex items-center gap-3 md:gap-4">
-          <div className="w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl bg-gradient-to-br from-chart-2 to-chart-3 flex items-center justify-center shadow-lg">
-            <Activity className="w-5 h-5 md:w-7 md:h-7 text-white" />
+      <div className="flex flex-col gap-3 md:gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 md:gap-4">
+          <div className="flex items-center gap-3 md:gap-4">
+            <div className="w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl bg-gradient-to-br from-chart-2 to-chart-3 flex items-center justify-center shadow-lg">
+              <Activity className="w-5 h-5 md:w-7 md:h-7 text-white" />
+            </div>
+            <div>
+              <h1 className="text-foreground text-lg md:text-2xl">Analytics</h1>
+              <p className="text-muted-foreground text-xs md:text-sm">Insights into your spending</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-foreground text-lg md:text-2xl">Analytics</h1>
-            <p className="text-muted-foreground text-xs md:text-sm">Insights into your spending</p>
+          <div className="flex items-center gap-2">
+            <DateRangePicker dateRange={dateRange} onDateRangeChange={setDateRange} />
+            <Button 
+              onClick={handleExportCSV} 
+              variant="outline" 
+              size="sm"
+              className="rounded-xl gap-2"
+              disabled={expenses.length === 0}
+            >
+              <Download className="w-4 h-4" />
+              <span className="hidden sm:inline">CSV</span>
+            </Button>
+            <Button 
+              onClick={handleExportPDF} 
+              variant="outline" 
+              size="sm"
+              className="rounded-xl gap-2"
+              disabled={expenses.length === 0}
+            >
+              <Download className="w-4 h-4" />
+              <span className="hidden sm:inline">PDF</span>
+            </Button>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <DateRangePicker dateRange={dateRange} onDateRangeChange={setDateRange} />
-          <Button 
-            onClick={handleExportCSV} 
-            variant="outline" 
-            size="sm"
-            className="rounded-xl gap-2"
-            disabled={expenses.length === 0}
-          >
-            <Download className="w-4 h-4" />
-            <span className="hidden sm:inline">CSV</span>
-          </Button>
-          <Button 
-            onClick={handleExportPDF} 
-            variant="outline" 
-            size="sm"
-            className="rounded-xl gap-2"
-            disabled={expenses.length === 0}
-          >
-            <Download className="w-4 h-4" />
-            <span className="hidden sm:inline">PDF</span>
-          </Button>
-        </div>
+
+        {/* Month Tabs */}
+        <Tabs value={selectedMonth} onValueChange={handleMonthChange} className="w-full">
+          <TabsList className="w-full h-auto flex-wrap justify-start gap-1 bg-secondary/50 p-1.5 rounded-xl">
+            {monthOptions.map((month) => (
+              <TabsTrigger
+                key={month.value}
+                value={month.value}
+                className="px-3 py-1.5 text-xs md:text-sm rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md transition-all"
+              >
+                {month.label}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </Tabs>
       </div>
 
       {/* Key Metrics */}
