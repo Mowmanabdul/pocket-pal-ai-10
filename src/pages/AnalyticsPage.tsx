@@ -16,13 +16,14 @@ import {
   subWeeks,
   eachDayOfInterval,
 } from "date-fns";
-import { TrendingUp, TrendingDown, Calendar, PieChart, Activity, DollarSign, Download } from "lucide-react";
+import { TrendingUp, TrendingDown, Calendar, PieChart, Activity, DollarSign, Download, ArrowLeftRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { exportToPDF, exportToCSV } from "@/lib/pdfExport";
 import { useAIInsights } from "@/hooks/useAIInsights";
 import { DateRangePicker } from "@/components/DateRangePicker";
 import { DateRange } from "react-day-picker";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { MonthComparison } from "@/components/MonthComparison";
 import {
   BarChart,
   Bar,
@@ -41,6 +42,7 @@ export function AnalyticsPage() {
   const { insights: aiInsights } = useAIInsights();
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   const [selectedMonth, setSelectedMonth] = useState<string>("all");
+  const [viewMode, setViewMode] = useState<"analytics" | "compare">("analytics");
 
   // Generate last 6 months for tabs
   const monthOptions = useMemo(() => {
@@ -263,47 +265,73 @@ export function AnalyticsPage() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <DateRangePicker dateRange={dateRange} onDateRangeChange={setDateRange} />
-            <Button 
-              onClick={handleExportCSV} 
-              variant="outline" 
+            <Button
+              onClick={() => setViewMode(viewMode === "analytics" ? "compare" : "analytics")}
+              variant={viewMode === "compare" ? "default" : "outline"}
               size="sm"
               className="rounded-xl gap-2"
-              disabled={expenses.length === 0}
             >
-              <Download className="w-4 h-4" />
-              <span className="hidden sm:inline">CSV</span>
+              <ArrowLeftRight className="w-4 h-4" />
+              <span className="hidden sm:inline">Compare</span>
             </Button>
-            <Button 
-              onClick={handleExportPDF} 
-              variant="outline" 
-              size="sm"
-              className="rounded-xl gap-2"
-              disabled={expenses.length === 0}
-            >
-              <Download className="w-4 h-4" />
-              <span className="hidden sm:inline">PDF</span>
-            </Button>
+            {viewMode === "analytics" && (
+              <>
+                <DateRangePicker dateRange={dateRange} onDateRangeChange={setDateRange} />
+                <Button 
+                  onClick={handleExportCSV} 
+                  variant="outline" 
+                  size="sm"
+                  className="rounded-xl gap-2"
+                  disabled={expenses.length === 0}
+                >
+                  <Download className="w-4 h-4" />
+                  <span className="hidden sm:inline">CSV</span>
+                </Button>
+                <Button 
+                  onClick={handleExportPDF} 
+                  variant="outline" 
+                  size="sm"
+                  className="rounded-xl gap-2"
+                  disabled={expenses.length === 0}
+                >
+                  <Download className="w-4 h-4" />
+                  <span className="hidden sm:inline">PDF</span>
+                </Button>
+              </>
+            )}
           </div>
         </div>
 
-        {/* Month Tabs */}
-        <Tabs value={selectedMonth} onValueChange={handleMonthChange} className="w-full">
-          <TabsList className="w-full h-auto flex-wrap justify-start gap-1 bg-secondary/50 p-1.5 rounded-xl">
-            {monthOptions.map((month) => (
-              <TabsTrigger
-                key={month.value}
-                value={month.value}
-                className="px-3 py-1.5 text-xs md:text-sm rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md transition-all"
-              >
-                {month.label}
-              </TabsTrigger>
-            ))}
-          </TabsList>
-        </Tabs>
+        {/* Month Tabs - Only show in analytics mode */}
+        {viewMode === "analytics" && (
+          <Tabs value={selectedMonth} onValueChange={handleMonthChange} className="w-full">
+            <TabsList className="w-full h-auto flex-wrap justify-start gap-1 bg-secondary/50 p-1.5 rounded-xl">
+              {monthOptions.map((month) => (
+                <TabsTrigger
+                  key={month.value}
+                  value={month.value}
+                  className="px-3 py-1.5 text-xs md:text-sm rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md transition-all"
+                >
+                  {month.label}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
+        )}
       </div>
 
-      {/* Key Metrics */}
+      {/* Comparison View */}
+      {viewMode === "compare" ? (
+        <div className="glass-card-elevated p-3 md:p-6">
+          <h2 className="text-foreground mb-4 flex items-center gap-2 text-sm md:text-base">
+            <ArrowLeftRight className="w-4 h-4 md:w-5 md:h-5 text-primary" />
+            Month Comparison
+          </h2>
+          <MonthComparison expenses={allExpenses} />
+        </div>
+      ) : (
+        <>
+          {/* Key Metrics */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-4 min-w-0">
         <div className="glass-card-elevated p-2.5 md:p-5 min-w-0">
           <div className="flex items-center justify-between mb-1 md:mb-2 gap-1">
@@ -472,6 +500,8 @@ export function AnalyticsPage() {
           </div>
         )}
       </div>
+        </>
+      )}
     </div>
   );
 }
