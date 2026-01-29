@@ -34,7 +34,7 @@ export function DashboardPage() {
   const { currency } = useCurrency();
   const isMobile = useIsMobile();
 
-  const totalThisMonth = expenses.reduce((sum, e) => sum + Number(e.amount), 0);
+  const overallTotal = expenses.reduce((sum, e) => sum + Number(e.amount), 0);
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -64,7 +64,7 @@ export function DashboardPage() {
             {getGreeting()}
           </h1>
           <p className="text-sm text-muted-foreground mt-0.5">
-            Spent <span className="font-semibold text-foreground">{formatCurrency(totalThisMonth, currency)}</span> this month
+            Total tracked: <span className="font-semibold text-foreground">{formatCurrency(overallTotal, currency)}</span>
           </p>
         </div>
         
