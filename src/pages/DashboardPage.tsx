@@ -99,32 +99,32 @@ export function DashboardPage() {
       <div className="grid sm:grid-cols-2 gap-3">
         {/* AI Insights Card */}
         <Link to="/ai-advisor" className="group">
-          <div className="glass-card-elevated p-3 cursor-pointer hover:shadow-lg transition-shadow h-full">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-accent to-chart-3 flex items-center justify-center shrink-0">
+          <div className="glass-card-elevated p-4 cursor-pointer hover:shadow-lg transition-all duration-300 h-full border border-transparent hover:border-primary/20">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-accent/80 to-chart-3/80 flex items-center justify-center shrink-0 shadow-lg shadow-accent/20">
                 <Sparkles className="w-5 h-5 text-white" />
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="text-sm font-semibold text-foreground">AI Advisor</h3>
-                <p className="text-xs text-muted-foreground">Personalized insights</p>
+                <h3 className="text-sm font-bold text-foreground">AI Advisor</h3>
+                <p className="text-xs text-muted-foreground mt-0.5">Get personalized insights</p>
               </div>
-              <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
+              <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-0.5 transition-all shrink-0" />
             </div>
           </div>
         </Link>
 
         {/* Analytics Card */}
         <Link to="/analytics" className="group">
-          <div className="glass-card-elevated p-3 cursor-pointer hover:shadow-lg transition-shadow h-full">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-chart-5 to-primary flex items-center justify-center shrink-0">
+          <div className="glass-card-elevated p-4 cursor-pointer hover:shadow-lg transition-all duration-300 h-full border border-transparent hover:border-primary/20">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-chart-5/80 to-primary/80 flex items-center justify-center shrink-0 shadow-lg shadow-primary/20">
                 <TrendingUp className="w-5 h-5 text-white" />
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="text-sm font-semibold text-foreground">Analytics</h3>
-                <p className="text-xs text-muted-foreground">Deep dive spending</p>
+                <h3 className="text-sm font-bold text-foreground">Analytics</h3>
+                <p className="text-xs text-muted-foreground mt-0.5">Deep dive into spending</p>
               </div>
-              <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
+              <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-0.5 transition-all shrink-0" />
             </div>
           </div>
         </Link>
@@ -137,26 +137,26 @@ export function DashboardPage() {
 
       {/* Charts Grid */}
       <div className="grid lg:grid-cols-2 gap-3">
-        <div className="glass-card-elevated p-3 md:p-4">
-          <h2 className="text-sm font-semibold text-foreground mb-3">By Category</h2>
+        <div className="glass-card-elevated p-4 md:p-5">
+          <h2 className="text-sm font-bold text-foreground mb-4">Spending by Category</h2>
           <SpendingChart expenses={expenses} />
         </div>
 
-        <div className="glass-card-elevated p-3 md:p-4">
-          <h2 className="text-sm font-semibold text-foreground mb-3">30-Day Trend</h2>
+        <div className="glass-card-elevated p-4 md:p-5">
+          <h2 className="text-sm font-bold text-foreground mb-4">30-Day Trend</h2>
           <SpendingTrends expenses={expenses} />
         </div>
       </div>
 
       {/* Recent Expenses */}
-      <div className="glass-card-elevated p-3 md:p-4">
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-sm font-semibold text-foreground">Recent Expenses</h2>
+      <div className="glass-card-elevated p-4 md:p-5">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-sm font-bold text-foreground">Recent Expenses</h2>
           {expenses.length > 5 && (
             <Link to="/expenses">
-              <Button variant="ghost" size="sm" className="text-primary hover:text-primary/80 text-xs h-7 px-2">
+              <Button variant="ghost" size="sm" className="text-primary hover:text-primary/80 text-xs h-8 px-3 font-medium">
                 View All
-                <ArrowRight className="w-3.5 h-3.5 ml-1" />
+                <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
               </Button>
             </Link>
           )}

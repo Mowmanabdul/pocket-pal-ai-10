@@ -62,13 +62,13 @@ export function ExpenseList({ expenses, onDelete, onEdit, onDuplicate, isDeletin
 
   if (expenses.length === 0) {
     return (
-      <div className="text-center py-10">
-        <div className="w-14 h-14 mx-auto mb-3 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
+      <div className="text-center py-12">
+        <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center border border-primary/10">
           <span className="text-2xl">💸</span>
         </div>
-        <h3 className="text-sm font-semibold text-foreground">No expenses yet</h3>
-        <p className="text-xs text-muted-foreground mt-1">
-          Add your first expense to start tracking
+        <h3 className="text-sm font-bold text-foreground">No expenses yet</h3>
+        <p className="text-xs text-muted-foreground mt-1.5 max-w-[200px] mx-auto">
+          Add your first expense to start tracking your spending
         </p>
       </div>
     );
@@ -76,34 +76,39 @@ export function ExpenseList({ expenses, onDelete, onEdit, onDuplicate, isDeletin
 
   return (
     <>
-      <div className="space-y-1.5 max-h-[400px] overflow-y-auto scrollbar-hide">
+      <div className="space-y-2 max-h-[400px] overflow-y-auto scrollbar-hide">
         {expenses.map((expense) => {
           const config = getCategoryConfig(expense.category);
           return (
             <div
               key={expense.id}
-              className="flex items-center gap-3 p-2.5 md:p-3 rounded-xl bg-secondary/30 hover:bg-secondary/50 transition-colors group"
+              className="flex items-center gap-3 p-3 rounded-xl bg-secondary/40 hover:bg-secondary/60 border border-transparent hover:border-border/50 transition-all duration-200 group"
             >
-              <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: config.color }} />
+              <div 
+                className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
+                style={{ backgroundColor: `${config.color}15` }}
+              >
+                <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: config.color }} />
+              </div>
               
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1.5">
-                  <p className="text-sm font-medium text-foreground truncate">
+                  <p className="text-sm font-semibold text-foreground truncate">
                     {expense.description || config.label}
                   </p>
                   {expense.receipt_url && (
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-5 w-5 shrink-0"
+                      className="h-5 w-5 shrink-0 opacity-60 hover:opacity-100"
                       onClick={() => setViewingReceipt(expense.receipt_url)}
                     >
                       <Receipt className="w-3 h-3 text-muted-foreground" />
                     </Button>
                   )}
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  {format(new Date(expense.date), "MMM d")} · {config.label}
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  {format(new Date(expense.date), "MMM d, yyyy")} · {config.label}
                 </p>
               </div>
 

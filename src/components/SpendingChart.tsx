@@ -35,11 +35,11 @@ export function SpendingChart({ expenses }: SpendingChartProps) {
   if (chartData.length === 0) {
     return (
       <div className="h-[180px] md:h-[300px] flex flex-col items-center justify-center text-muted-foreground">
-        <div className="w-12 h-12 mb-3 rounded-full bg-secondary flex items-center justify-center">
-          <span className="text-2xl">📈</span>
+        <div className="w-14 h-14 mb-4 rounded-2xl bg-gradient-to-br from-secondary to-muted flex items-center justify-center border border-border/50">
+          <span className="text-2xl">📊</span>
         </div>
-        <p className="font-medium text-sm">No data yet</p>
-        <p className="text-xs">Add expenses to see breakdown</p>
+        <p className="font-semibold text-sm text-foreground">No data yet</p>
+        <p className="text-xs mt-1">Add expenses to see breakdown</p>
       </div>
     );
   }
@@ -78,20 +78,20 @@ export function SpendingChart({ expenses }: SpendingChartProps) {
           </PieChart>
         </ResponsiveContainer>
       </div>
-      <div className="flex flex-wrap md:flex-col justify-center gap-1.5 md:gap-2 md:w-[120px] px-2 md:px-0">
+      <div className="flex flex-wrap md:flex-col justify-center gap-2 md:gap-2.5 md:w-[130px] px-2 md:px-0">
         {chartData.slice(0, 5).map((item) => (
-          <div key={item.name} className="flex items-center gap-1.5">
+          <div key={item.name} className="flex items-center gap-2 px-2 py-1 rounded-lg bg-secondary/30">
             <div
-              className="w-2.5 h-2.5 rounded-full shrink-0"
+              className="w-2 h-2 rounded-full shrink-0"
               style={{ backgroundColor: item.color }}
             />
-            <span className="text-[10px] md:text-xs text-muted-foreground truncate max-w-[70px] md:max-w-[90px]">
+            <span className="text-[10px] md:text-xs font-medium text-foreground truncate max-w-[70px] md:max-w-[90px]">
               {item.name}
             </span>
           </div>
         ))}
         {chartData.length > 5 && (
-          <span className="text-[10px] md:text-xs text-muted-foreground">
+          <span className="text-[10px] md:text-xs text-muted-foreground px-2">
             +{chartData.length - 5} more
           </span>
         )}

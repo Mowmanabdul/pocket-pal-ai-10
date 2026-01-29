@@ -64,14 +64,14 @@ export function StatsCards({ expenses }: StatsCardsProps) {
       <div className="stat-card min-w-0">
         <div className="relative z-10 flex items-start justify-between gap-2">
           <div className="min-w-0 flex-1">
-            <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest">This Month</p>
-            <p className="text-lg md:text-2xl font-bold text-foreground mt-1 truncate tracking-tight">
+            <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">This Month</p>
+            <p className="text-xl md:text-2xl font-extrabold text-foreground mt-1.5 truncate tracking-tight">
               {formatCurrency(stats.thisMonthTotal, currency)}
             </p>
-            <p className="text-[11px] text-muted-foreground mt-1 font-medium">Total spending</p>
+            <p className="text-[11px] text-muted-foreground mt-1.5 font-medium">Total spending</p>
           </div>
-          <div className="icon-container w-9 h-9 md:w-10 md:h-10 shrink-0">
-            <Wallet className="w-4 h-4 md:w-5 md:h-5 text-primary" />
+          <div className="icon-container w-10 h-10 md:w-11 md:h-11 shrink-0 rounded-xl">
+            <Wallet className="w-4.5 h-4.5 md:w-5 md:h-5 text-primary" />
           </div>
         </div>
       </div>
@@ -80,18 +80,20 @@ export function StatsCards({ expenses }: StatsCardsProps) {
       <div className="stat-card min-w-0">
         <div className="relative z-10 flex items-start justify-between gap-2">
           <div className="min-w-0 flex-1">
-            <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest">vs Last Month</p>
-            <div className="flex items-center gap-1.5 mt-1">
-              <p className={`text-lg md:text-2xl font-bold tracking-tight ${stats.percentChange <= 0 ? "text-success" : "text-warning"}`}>
+            <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">vs Last Month</p>
+            <div className="flex items-center gap-2 mt-1.5">
+              <p className={`text-xl md:text-2xl font-extrabold tracking-tight ${stats.percentChange <= 0 ? "text-success" : "text-warning"}`}>
                 {stats.percentChange >= 0 ? "+" : ""}{stats.percentChange.toFixed(0)}%
               </p>
-              {stats.percentChange <= 0 ? (
-                <ArrowDownRight className="w-4 h-4 md:w-5 md:h-5 text-success shrink-0" />
-              ) : (
-                <ArrowUpRight className="w-4 h-4 md:w-5 md:h-5 text-warning shrink-0" />
-              )}
+              <div className={`w-6 h-6 rounded-full flex items-center justify-center ${stats.percentChange <= 0 ? "bg-success/10" : "bg-warning/10"}`}>
+                {stats.percentChange <= 0 ? (
+                  <ArrowDownRight className="w-3.5 h-3.5 text-success" />
+                ) : (
+                  <ArrowUpRight className="w-3.5 h-3.5 text-warning" />
+                )}
+              </div>
             </div>
-            <p className="text-[11px] text-muted-foreground mt-1 font-medium">
+            <p className="text-[11px] text-muted-foreground mt-1.5 font-medium">
               {stats.percentChange <= 0 ? "You're saving!" : "Spending more"}
             </p>
           </div>
@@ -102,14 +104,14 @@ export function StatsCards({ expenses }: StatsCardsProps) {
       <div className="stat-card min-w-0">
         <div className="relative z-10 flex items-start justify-between gap-2">
           <div className="min-w-0 flex-1">
-            <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest">Daily Avg</p>
-            <p className="text-lg md:text-2xl font-bold text-foreground mt-1 truncate tracking-tight">
+            <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Daily Avg</p>
+            <p className="text-xl md:text-2xl font-extrabold text-foreground mt-1.5 truncate tracking-tight">
               {formatCurrency(stats.avgDaily, currency)}
             </p>
-            <p className="text-[11px] text-muted-foreground mt-1 font-medium">Per day</p>
+            <p className="text-[11px] text-muted-foreground mt-1.5 font-medium">Per day this month</p>
           </div>
-          <div className="icon-container w-9 h-9 md:w-10 md:h-10 shrink-0" style={{ background: `linear-gradient(135deg, hsl(var(--chart-2) / 0.1), hsl(var(--chart-2) / 0.05))` }}>
-            <Target className="w-4 h-4 md:w-5 md:h-5 text-chart-2" />
+          <div className="icon-container w-10 h-10 md:w-11 md:h-11 shrink-0 rounded-xl" style={{ background: `linear-gradient(135deg, hsl(var(--chart-2) / 0.1), hsl(var(--chart-2) / 0.05))` }}>
+            <Target className="w-4.5 h-4.5 md:w-5 md:h-5 text-chart-2" />
           </div>
         </div>
       </div>
@@ -118,28 +120,33 @@ export function StatsCards({ expenses }: StatsCardsProps) {
       <div className="stat-card min-w-0">
         <div className="relative z-10 flex items-start justify-between gap-2">
           <div className="min-w-0 flex-1">
-            <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest">Top Category</p>
+            <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Top Category</p>
             {stats.topCategory ? (
               <>
-                <div className="flex items-center gap-2 mt-1 min-w-0">
-                  <span 
-                    className="w-3 h-3 rounded-full shrink-0 ring-2 ring-offset-2 ring-offset-card"
-                    style={{ backgroundColor: getCategoryConfig(stats.topCategory.category).color, boxShadow: `0 0 8px ${getCategoryConfig(stats.topCategory.category).color}40` }}
-                  />
+                <div className="flex items-center gap-2 mt-1.5 min-w-0">
+                  <div 
+                    className="w-6 h-6 rounded-lg flex items-center justify-center shrink-0"
+                    style={{ backgroundColor: `${getCategoryConfig(stats.topCategory.category).color}15` }}
+                  >
+                    <span 
+                      className="w-2 h-2 rounded-full"
+                      style={{ backgroundColor: getCategoryConfig(stats.topCategory.category).color }}
+                    />
+                  </div>
                   <span className="text-sm font-bold text-foreground truncate">
                     {getCategoryConfig(stats.topCategory.category).label}
                   </span>
                 </div>
-                <p className="text-[11px] text-muted-foreground mt-1 truncate font-medium">
-                  {formatCurrency(stats.topCategory.amount, currency)}
+                <p className="text-[11px] text-muted-foreground mt-1.5 truncate font-medium">
+                  {formatCurrency(stats.topCategory.amount, currency)} spent
                 </p>
               </>
             ) : (
-              <p className="text-sm font-medium text-muted-foreground mt-1">No data</p>
+              <p className="text-sm font-medium text-muted-foreground mt-1.5">No data yet</p>
             )}
           </div>
-          <div className="icon-container w-9 h-9 md:w-10 md:h-10 shrink-0" style={{ background: `linear-gradient(135deg, hsl(var(--chart-3) / 0.1), hsl(var(--chart-3) / 0.05))` }}>
-            <Zap className="w-4 h-4 md:w-5 md:h-5 text-chart-3" />
+          <div className="icon-container w-10 h-10 md:w-11 md:h-11 shrink-0 rounded-xl" style={{ background: `linear-gradient(135deg, hsl(var(--chart-3) / 0.1), hsl(var(--chart-3) / 0.05))` }}>
+            <Zap className="w-4.5 h-4.5 md:w-5 md:h-5 text-chart-3" />
           </div>
         </div>
       </div>

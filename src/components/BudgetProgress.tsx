@@ -76,22 +76,24 @@ export function BudgetProgress({ expenses }: BudgetProgressProps) {
   if (budgetItems.length === 0) {
     return (
       <Card className="glass-card">
-        <CardHeader className="pb-2 pt-3 px-3">
-          <CardTitle className="text-sm flex items-center gap-1.5">
-            <Target className="h-4 w-4 text-primary" />
+        <CardHeader className="pb-2 pt-4 px-4">
+          <CardTitle className="text-sm flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center">
+              <Target className="h-3.5 w-3.5 text-primary" />
+            </div>
             Budget Progress
           </CardTitle>
         </CardHeader>
-        <CardContent className="px-3 pb-3">
-          <div className="text-center py-4">
-            <div className="w-10 h-10 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-2">
+        <CardContent className="px-4 pb-4">
+          <div className="text-center py-6">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-secondary to-muted flex items-center justify-center mx-auto mb-3 border border-border/50">
               <Target className="h-5 w-5 text-muted-foreground" />
             </div>
-            <p className="text-xs text-muted-foreground">
-              No budgets set yet
+            <p className="text-sm font-medium text-foreground">
+              No budgets set
             </p>
-            <p className="text-[10px] text-muted-foreground mt-0.5">
-              Set limits in Settings
+            <p className="text-xs text-muted-foreground mt-1">
+              Set spending limits in Settings
             </p>
           </div>
         </CardContent>
@@ -107,22 +109,24 @@ export function BudgetProgress({ expenses }: BudgetProgressProps) {
 
   return (
     <Card className="glass-card overflow-hidden">
-      <CardHeader className="border-b border-border/50 pb-3 pt-3 px-3">
+      <CardHeader className="border-b border-border/30 pb-4 pt-4 px-4">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-sm flex items-center gap-1.5">
-            <Target className="h-4 w-4 text-primary" />
+          <CardTitle className="text-sm flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center">
+              <Target className="h-3.5 w-3.5 text-primary" />
+            </div>
             Budget Progress
           </CardTitle>
           <div className="text-right">
-            <p className="text-xs font-semibold">
-              {format(totalSpent)} <span className="text-muted-foreground font-normal">/ {format(totalBudget)}</span>
+            <p className="text-sm font-bold">
+              {format(totalSpent)} <span className="text-muted-foreground font-normal text-xs">/ {format(totalBudget)}</span>
             </p>
-            <p className="text-[10px] text-muted-foreground">{Math.round(overallPercentage)}% used</p>
+            <p className="text-[10px] text-muted-foreground mt-0.5">{Math.round(overallPercentage)}% used</p>
           </div>
         </div>
         <Progress 
           value={Math.min(overallPercentage, 100)} 
-          className="h-1.5 mt-2"
+          className="h-2 mt-3"
         />
       </CardHeader>
       <CardContent className="p-3 space-y-3">
