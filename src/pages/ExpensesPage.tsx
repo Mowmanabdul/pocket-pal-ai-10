@@ -6,11 +6,11 @@ import { ExpenseFilters } from "@/components/ExpenseFilters";
 import { DateRangePicker } from "@/components/DateRangePicker";
 import { CSVImportDialog } from "@/components/CSVImportDialog";
 import { Button } from "@/components/ui/button";
-import { Plus, Receipt, Upload } from "lucide-react";
+import { Plus, Receipt, Upload, TrendingUp, TrendingDown, Minus } from "lucide-react";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { formatCurrency } from "@/lib/currencies";
 import { DateRange } from "react-day-picker";
-import { isWithinInterval } from "date-fns";
+import { isWithinInterval, subMonths, startOfMonth, endOfMonth, format, isToday, isYesterday, isThisWeek, isThisMonth, parseISO } from "date-fns";
 import {
   Dialog,
   DialogContent,
@@ -26,6 +26,7 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Expense } from "@/lib/types";
 
 export function ExpensesPage() {
   const { expenses, isLoading, addExpense, updateExpense, deleteExpense } = useExpenses();
@@ -83,6 +84,56 @@ export function ExpensesPage() {
 
   const totalAmount = filteredExpenses.reduce((sum, e) => sum + Number(e.amount), 0);
 
+  // Calculate month-over-month change
+  const monthStats = useMemo(() => {
+    const now = new Date();
+    const thisMonthStart = startOfMonth(now);
+    const thisMonthEnd = endOfMonth(now);
+    const lastMonthStart = startOfMonth(subMonths(now, 1));
+    const lastMonthEnd = endOfMonth(subMonths(now, 1));
+
+    const thisMonthTotal = expenses
+      .filter(e => isWithinInterval(new Date(e.date), { start: thisMonthStart, end: thisMonthEnd }))
+      .reduce((sum, e) => sum + Number(e.amount), 0);
+
+    const lastMonthTotal = expenses
+      .filter(e => isWithinInterval(new Date(e.date), { start: lastMonthStart, end: lastMonthEnd }))
+      .reduce((sum, e) => sum + Number(e.amount), 0);
+
+    const percentChange = lastMonthTotal > 0 
+      ? ((thisMonthTotal - lastMonthTotal) / lastMonthTotal) * 100 
+      : 0;
+
+    return { thisMonthTotal, lastMonthTotal, percentChange };
+  }, [expenses]);
+
+  // Group expenses by date period
+  const groupedExpenses = useMemo(() => {
+    const groups: { label: string; expenses: Expense[]; total: number }[] = [];
+    const today: Expense[] = [];
+    const yesterday: Expense[] = [];
+    const thisWeek: Expense[] = [];
+    const thisMonth: Expense[] = [];
+    const older: Expense[] = [];
+
+    filteredExpenses.forEach(expense => {
+      const date = new Date(expense.date);
+      if (isToday(date)) today.push(expense);
+      else if (isYesterday(date)) yesterday.push(expense);
+      else if (isThisWeek(date)) thisWeek.push(expense);
+      else if (isThisMonth(date)) thisMonth.push(expense);
+      else older.push(expense);
+    });
+
+    if (today.length > 0) groups.push({ label: "Today", expenses: today, total: today.reduce((s, e) => s + Number(e.amount), 0) });
+    if (yesterday.length > 0) groups.push({ label: "Yesterday", expenses: yesterday, total: yesterday.reduce((s, e) => s + Number(e.amount), 0) });
+    if (thisWeek.length > 0) groups.push({ label: "This Week", expenses: thisWeek, total: thisWeek.reduce((s, e) => s + Number(e.amount), 0) });
+    if (thisMonth.length > 0) groups.push({ label: "This Month", expenses: thisMonth, total: thisMonth.reduce((s, e) => s + Number(e.amount), 0) });
+    if (older.length > 0) groups.push({ label: "Older", expenses: older, total: older.reduce((s, e) => s + Number(e.amount), 0) });
+
+    return groups;
+  }, [filteredExpenses]);
+
   const handleSubmit = (expense: Parameters<typeof addExpense.mutate>[0]) => {
     addExpense.mutate(expense);
     setIsOpen(false);
@@ -111,6 +162,21 @@ export function ExpensesPage() {
                 <span>items</span>
                 <span>•</span>
                 <span className="font-medium text-foreground">{formatCurrency(totalAmount, currency)}</span>
+                {monthStats.percentChange !== 0 && (
+                  <>
+                    <span>•</span>
+                    <span className={`flex items-center gap-0.5 font-medium ${
+                      monthStats.percentChange < 0 ? 'text-success' : 'text-warning'
+                    }`}>
+                      {monthStats.percentChange < 0 ? (
+                        <TrendingDown className="w-3 h-3" />
+                      ) : (
+                        <TrendingUp className="w-3 h-3" />
+                      )}
+                      {Math.abs(monthStats.percentChange).toFixed(0)}%
+                    </span>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -171,16 +237,36 @@ export function ExpensesPage() {
               <div key={i} className="h-16 rounded-xl shimmer" />
             ))}
           </div>
+        ) : groupedExpenses.length > 0 ? (
+          <div className="space-y-4">
+            {groupedExpenses.map((group) => (
+              <div key={group.label} className="space-y-2">
+                <div className="flex items-center justify-between px-1">
+                  <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                    {group.label}
+                  </h3>
+                  <span className="text-xs font-medium text-foreground">
+                    {formatCurrency(group.total, currency)}
+                  </span>
+                </div>
+                <ExpenseList
+                  expenses={group.expenses}
+                  onDelete={(id) => deleteExpense.mutate(id)}
+                  onEdit={(expense) => updateExpense.mutate(expense)}
+                  onDuplicate={(expense) => addExpense.mutate(expense)}
+                  isDeleting={deleteExpense.isPending}
+                  isUpdating={updateExpense.isPending}
+                  isAdding={addExpense.isPending}
+                />
+              </div>
+            ))}
+          </div>
         ) : (
-          <ExpenseList
-            expenses={filteredExpenses}
-            onDelete={(id) => deleteExpense.mutate(id)}
-            onEdit={(expense) => updateExpense.mutate(expense)}
-            onDuplicate={(expense) => addExpense.mutate(expense)}
-            isDeleting={deleteExpense.isPending}
-            isUpdating={updateExpense.isPending}
-            isAdding={addExpense.isPending}
-          />
+          <div className="text-center py-12">
+            <Receipt className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3" />
+            <p className="text-muted-foreground text-sm">No expenses found</p>
+            <p className="text-muted-foreground/60 text-xs mt-1">Add your first expense to get started</p>
+          </div>
         )}
       </div>
 

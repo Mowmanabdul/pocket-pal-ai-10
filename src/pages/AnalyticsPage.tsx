@@ -22,8 +22,11 @@ import { exportToPDF, exportToCSV } from "@/lib/pdfExport";
 import { useAIInsights } from "@/hooks/useAIInsights";
 import { DateRangePicker } from "@/components/DateRangePicker";
 import { DateRange } from "react-day-picker";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MonthComparison } from "@/components/MonthComparison";
+import { SpendingVelocity } from "@/components/analytics/SpendingVelocity";
+import { TopExpenses } from "@/components/analytics/TopExpenses";
+import { SavingsSuggestions } from "@/components/analytics/SavingsSuggestions";
 import {
   BarChart,
   Bar,
@@ -404,6 +407,13 @@ export function AnalyticsPage() {
           </div>
         </div>
       )}
+
+      {/* New Analytics Widgets */}
+      <div className="grid lg:grid-cols-3 gap-3 md:gap-4">
+        <SpendingVelocity expenses={expenses} selectedMonth={selectedMonth} />
+        <TopExpenses expenses={expenses} />
+        <SavingsSuggestions expenses={expenses} />
+      </div>
 
       {/* Charts Grid */}
       <div className="grid lg:grid-cols-2 gap-3 md:gap-6">
