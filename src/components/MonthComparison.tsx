@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { format, subMonths, startOfMonth, endOfMonth, isWithinInterval } from "date-fns";
-import { TrendingUp, TrendingDown, ArrowRight, Minus } from "lucide-react";
+import { TrendingUp, TrendingDown, ArrowRight, Minus, Wallet, AlertCircle } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { useCategoryLabelsContext } from "@/contexts/CategoryLabelsContext";
@@ -124,7 +124,7 @@ export function MonthComparison({ expenses }: MonthComparisonProps) {
         </div>
       </div>
 
-      {/* Summary Cards */}
+      {/* Summary Cards - Enhanced */}
       <div className="grid grid-cols-3 gap-2 md:gap-4">
         <div className="glass-card-elevated p-3 md:p-4 text-center">
           <p className="text-[10px] md:text-xs text-muted-foreground mb-1">{getMonthLabel(month1)}</p>
@@ -164,6 +164,47 @@ export function MonthComparison({ expenses }: MonthComparisonProps) {
           </p>
         </div>
       </div>
+
+      {/* Savings/Overspend Indicator */}
+      {month1Total > 0 && (
+        <div className={`p-3 md:p-4 rounded-xl ${
+          month2Total < month1Total 
+            ? 'bg-success/10 border border-success/20' 
+            : month2Total > month1Total 
+              ? 'bg-warning/10 border border-warning/20'
+              : 'bg-secondary/30'
+        }`}>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              {month2Total < month1Total ? (
+                <Wallet className="w-5 h-5 text-success" />
+              ) : month2Total > month1Total ? (
+                <AlertCircle className="w-5 h-5 text-warning" />
+              ) : (
+                <Minus className="w-5 h-5 text-muted-foreground" />
+              )}
+              <div>
+                <p className={`text-sm font-medium ${
+                  month2Total < month1Total ? 'text-success' : month2Total > month1Total ? 'text-warning' : 'text-foreground'
+                }`}>
+                  {month2Total < month1Total ? 'You saved money!' : month2Total > month1Total ? 'Overspent' : 'Same spending'}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {month2Total !== month1Total 
+                    ? `${formatCurrency(Math.abs(month2Total - month1Total), currency)} ${month2Total < month1Total ? 'less' : 'more'} than ${getMonthLabel(month1)}`
+                    : 'Identical spending between months'
+                  }
+                </p>
+              </div>
+            </div>
+            <p className={`text-lg md:text-xl font-bold ${
+              month2Total < month1Total ? 'text-success' : month2Total > month1Total ? 'text-warning' : 'text-foreground'
+            }`}>
+              {month2Total < month1Total ? '-' : month2Total > month1Total ? '+' : ''}{formatCurrency(Math.abs(month2Total - month1Total), currency)}
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Category Comparison */}
       <div className="space-y-3">
