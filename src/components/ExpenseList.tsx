@@ -41,9 +41,10 @@ interface ExpenseListProps {
   isDeleting?: boolean;
   isUpdating?: boolean;
   isAdding?: boolean;
+  compact?: boolean;
 }
 
-export function ExpenseList({ expenses, onDelete, onEdit, onDuplicate, isDeleting, isUpdating, isAdding }: ExpenseListProps) {
+export function ExpenseList({ expenses, onDelete, onEdit, onDuplicate, isDeleting, isUpdating, isAdding, compact }: ExpenseListProps) {
   const { currency } = useCurrency();
   const { getCategoryConfig } = useCategoryLabelsContext();
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
