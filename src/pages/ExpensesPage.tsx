@@ -116,7 +116,7 @@ export function ExpensesPage() {
   );
 
   return (
-    <div className="p-4 md:p-6 space-y-4 max-w-4xl mx-auto min-w-0">
+    <div className="px-3 py-4 md:px-6 md:py-6 space-y-4 w-full max-w-4xl md:mx-auto min-w-0 box-border">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>

@@ -27,7 +27,7 @@ export function SettingsPage() {
   };
 
   return (
-    <div className="p-4 md:p-6 space-y-5 max-w-2xl mx-auto">
+    <div className="px-3 py-4 md:px-6 md:py-6 space-y-5 w-full max-w-2xl md:mx-auto min-w-0 box-border">
       {/* Header */}
       <div>
         <h1 className="text-xl md:text-2xl font-bold text-foreground">Settings</h1>

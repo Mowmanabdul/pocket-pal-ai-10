@@ -103,7 +103,7 @@ export function AnalyticsPage() {
   }
 
   return (
-    <div className="p-4 md:p-6 space-y-5 max-w-6xl mx-auto min-w-0">
+    <div className="px-3 py-4 md:px-6 md:py-6 space-y-5 w-full max-w-6xl md:mx-auto min-w-0 box-border">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <h1 className="text-xl md:text-2xl font-bold text-foreground">Analytics</h1>

@@ -8,7 +8,7 @@ export function AIAdvisorPage() {
   const { expenses } = useExpenses();
 
   return (
-    <div className="p-4 md:p-6 space-y-4 max-w-3xl mx-auto min-w-0">
+    <div className="px-3 py-4 md:px-6 md:py-6 space-y-4 w-full max-w-3xl md:mx-auto min-w-0 box-border">
       {/* Header */}
       <div>
         <h1 className="text-xl md:text-2xl font-bold text-foreground">AI Advisor</h1>

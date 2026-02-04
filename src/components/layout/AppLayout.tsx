@@ -22,7 +22,7 @@ export function AppLayout({ children }: AppLayoutProps) {
             </Button>
           </Link>
         </header>
-        <main className="flex-1 overflow-x-hidden overflow-y-auto pb-20 md:pb-0">
+        <main className="flex-1 overflow-x-hidden overflow-y-auto pb-24 md:pb-0 w-full">
           {children}
         </main>
         <BottomNav />
