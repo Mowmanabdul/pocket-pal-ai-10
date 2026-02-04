@@ -55,7 +55,7 @@ export function DashboardPage() {
   );
 
   return (
-    <div className="p-4 md:p-6 lg:p-8 space-y-5 max-w-5xl min-w-0">
+    <div className="p-4 md:p-6 lg:p-8 space-y-5 w-full max-w-5xl mx-auto min-w-0">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>

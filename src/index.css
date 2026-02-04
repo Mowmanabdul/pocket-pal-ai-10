@@ -367,6 +367,17 @@
     @apply overflow-x-hidden;
   }
 
+  /* Ensure the app shell spans the full viewport width.
+     This prevents unintended centering/max-width rules from shifting pages to the right
+     (especially noticeable with the desktop sidebar layout). */
+  #root {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    text-align: left;
+  }
+
   body {
     @apply bg-background text-foreground antialiased;
     font-family: 'Plus Jakarta Sans', 'DM Sans', system-ui, sans-serif;
