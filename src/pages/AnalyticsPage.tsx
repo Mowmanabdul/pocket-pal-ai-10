@@ -1,5 +1,6 @@
 import { useExpenses } from "@/hooks/useExpenses";
 import { SpendingChart } from "@/components/SpendingChart";
+import { PageContainer } from "@/components/layout/PageContainer";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { formatCurrency } from "@/lib/currencies";
 import { useMemo, useState } from "react";
@@ -92,18 +93,18 @@ export function AnalyticsPage() {
 
   if (isLoading) {
     return (
-      <div className="p-4 md:p-6 space-y-4 max-w-6xl mx-auto">
+      <PageContainer maxWidth="xl">
         <div className="h-12 rounded-xl shimmer" />
         <div className="grid grid-cols-3 gap-3">
           {[...Array(3)].map((_, i) => <div key={i} className="h-20 rounded-xl shimmer" />)}
         </div>
         <div className="h-64 rounded-xl shimmer" />
-      </div>
+      </PageContainer>
     );
   }
 
   return (
-    <div className="px-3 py-4 md:px-6 md:py-6 space-y-5 w-full max-w-6xl md:mx-auto min-w-0 box-border">
+    <PageContainer maxWidth="xl">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <h1 className="text-xl md:text-2xl font-bold text-foreground">Analytics</h1>
@@ -201,6 +202,6 @@ export function AnalyticsPage() {
           </div>
         </>
       )}
-    </div>
+    </PageContainer>
   );
 }

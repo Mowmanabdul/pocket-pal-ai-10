@@ -4,6 +4,7 @@ import { currencies } from "@/lib/currencies";
 import { BudgetSettings } from "@/components/BudgetSettings";
 import { CategoryLabelSettings } from "@/components/CategoryLabelSettings";
 import { EmailPreferencesSettings } from "@/components/EmailPreferencesSettings";
+import { PageContainer } from "@/components/layout/PageContainer";
 import { Globe, Palette, Check } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -27,7 +28,7 @@ export function SettingsPage() {
   };
 
   return (
-    <div className="px-3 py-4 md:px-6 md:py-6 space-y-5 w-full max-w-2xl md:mx-auto min-w-0 box-border">
+    <PageContainer maxWidth="sm">
       {/* Header */}
       <div>
         <h1 className="text-xl md:text-2xl font-bold text-foreground">Settings</h1>
@@ -105,6 +106,6 @@ export function SettingsPage() {
 
       {/* Email Preferences */}
       <EmailPreferencesSettings />
-    </div>
+    </PageContainer>
   );
 }
