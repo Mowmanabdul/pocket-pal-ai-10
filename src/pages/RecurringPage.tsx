@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { useRecurringExpenses } from "@/hooks/useRecurringExpenses";
 import { RecurringExpenseForm } from "@/components/RecurringExpenseForm";
 import { RecurringExpensesList } from "@/components/RecurringExpensesList";
+import { PageContainer } from "@/components/layout/PageContainer";
 import { Button } from "@/components/ui/button";
 import { DateRangePicker } from "@/components/DateRangePicker";
 import { DateRange } from "react-day-picker";
@@ -43,7 +44,7 @@ export function RecurringPage() {
   const activeCount = recurringExpenses.filter(e => e.is_active).length;
 
   return (
-    <div className="px-3 py-4 md:px-6 md:py-6 space-y-4 w-full max-w-3xl md:mx-auto min-w-0 box-border">
+    <PageContainer maxWidth="sm">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
@@ -103,6 +104,6 @@ export function RecurringPage() {
           />
         )}
       </div>
-    </div>
+    </PageContainer>
   );
 }

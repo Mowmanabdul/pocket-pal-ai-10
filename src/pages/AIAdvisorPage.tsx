@@ -1,6 +1,7 @@
 import { useExpenses } from "@/hooks/useExpenses";
 import { AIChatPanel } from "@/components/AIChatPanel";
 import { AIInsightsPanel } from "@/components/AIInsightsPanel";
+import { PageContainer } from "@/components/layout/PageContainer";
 import { MessageCircle, Lightbulb } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -8,7 +9,7 @@ export function AIAdvisorPage() {
   const { expenses } = useExpenses();
 
   return (
-    <div className="px-3 py-4 md:px-6 md:py-6 space-y-4 w-full max-w-3xl md:mx-auto min-w-0 box-border">
+    <PageContainer maxWidth="sm">
       {/* Header */}
       <div>
         <h1 className="text-xl md:text-2xl font-bold text-foreground">AI Advisor</h1>
@@ -40,6 +41,6 @@ export function AIAdvisorPage() {
           </div>
         </TabsContent>
       </Tabs>
-    </div>
+    </PageContainer>
   );
 }

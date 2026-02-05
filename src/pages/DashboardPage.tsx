@@ -5,6 +5,7 @@ import { BudgetProgress } from "@/components/BudgetProgress";
 import { BudgetAlerts } from "@/components/BudgetAlerts";
 import { ExpenseList } from "@/components/ExpenseList";
 import { ExpenseForm } from "@/components/ExpenseForm";
+import { PageContainer } from "@/components/layout/PageContainer";
 import { Button } from "@/components/ui/button";
 import { Plus, ArrowRight } from "lucide-react";
 import { useState } from "react";
@@ -55,7 +56,7 @@ export function DashboardPage() {
   );
 
   return (
-    <div className="px-3 py-4 md:px-6 md:py-6 lg:px-8 space-y-5 w-full max-w-5xl md:mx-auto min-w-0 box-border">
+    <PageContainer maxWidth="lg">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -146,7 +147,7 @@ export function DashboardPage() {
       <Drawer open={isMobile && isOpen} onOpenChange={(open) => isMobile && setIsOpen(open)}>
         <DrawerTrigger asChild>
           <button 
-            className="fab-button sm:hidden bottom-24 right-4 shadow-xl"
+            className="fab-button sm:hidden"
             onClick={() => setIsOpen(true)}
           >
             <Plus className="w-6 h-6 text-primary-foreground" />
@@ -161,6 +162,6 @@ export function DashboardPage() {
           </div>
         </DrawerContent>
       </Drawer>
-    </div>
+    </PageContainer>
   );
 }

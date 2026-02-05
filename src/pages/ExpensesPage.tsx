@@ -5,6 +5,7 @@ import { ExpenseForm } from "@/components/ExpenseForm";
 import { ExpenseFilters } from "@/components/ExpenseFilters";
 import { DateRangePicker } from "@/components/DateRangePicker";
 import { CSVImportDialog } from "@/components/CSVImportDialog";
+import { PageContainer } from "@/components/layout/PageContainer";
 import { Button } from "@/components/ui/button";
 import { Plus, Upload } from "lucide-react";
 import { useCurrency } from "@/contexts/CurrencyContext";
@@ -116,7 +117,7 @@ export function ExpensesPage() {
   );
 
   return (
-    <div className="px-3 py-4 md:px-6 md:py-6 space-y-4 w-full max-w-4xl md:mx-auto min-w-0 box-border">
+    <PageContainer maxWidth="md">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -198,7 +199,7 @@ export function ExpensesPage() {
       {/* Mobile Drawer */}
       <Drawer open={isMobile && isOpen} onOpenChange={(open) => isMobile && setIsOpen(open)}>
         <DrawerTrigger asChild>
-          <button className="fab-button md:hidden bottom-24 right-4" onClick={() => setIsOpen(true)}>
+          <button className="fab-button md:hidden" onClick={() => setIsOpen(true)}>
             <Plus className="w-6 h-6 text-primary-foreground" />
           </button>
         </DrawerTrigger>
@@ -209,6 +210,6 @@ export function ExpensesPage() {
           <div className="px-4 pb-6 overflow-y-auto">{formContent}</div>
         </DrawerContent>
       </Drawer>
-    </div>
+    </PageContainer>
   );
 }
