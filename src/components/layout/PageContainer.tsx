@@ -3,16 +3,17 @@ import { cn } from "@/lib/utils";
 
 interface PageContainerProps {
   children: ReactNode;
-  /** Maximum width variant - default is "md" */
-  maxWidth?: "sm" | "md" | "lg" | "xl";
+  /** Maximum width variant - default is "lg" */
+  maxWidth?: "sm" | "md" | "lg" | "xl" | "full";
   className?: string;
 }
 
 const maxWidthClasses = {
-  sm: "max-w-2xl",
-  md: "max-w-4xl", 
-  lg: "max-w-5xl",
-  xl: "max-w-6xl",
+  sm: "max-w-xl",
+  md: "max-w-2xl", 
+  lg: "max-w-4xl",
+  xl: "max-w-5xl",
+  full: "max-w-full",
 };
 
 /**
@@ -21,27 +22,32 @@ const maxWidthClasses = {
  */
 export function PageContainer({ 
   children, 
-  maxWidth = "md",
+  maxWidth = "lg",
   className 
 }: PageContainerProps) {
   return (
     <div 
       className={cn(
-        // Base responsive padding
-        "px-4 py-4 md:px-6 md:py-6 lg:px-8",
-        // Spacing between children
-        "space-y-5",
-        // Full width with max constraint
-        "w-full",
-        maxWidthClasses[maxWidth],
-        // Center on larger screens (where sidebar exists)
-        "mx-auto",
-        // Prevent horizontal overflow
-        "min-w-0 box-border",
-        className
+        // Full width container with centered content
+        "w-full flex justify-center",
       )}
     >
-      {children}
+      <div 
+        className={cn(
+          // Base responsive padding - symmetrical on all sides
+          "px-4 py-5 md:px-6 md:py-6",
+          // Spacing between children
+          "space-y-4 md:space-y-5",
+          // Full width with max constraint
+          "w-full",
+          maxWidthClasses[maxWidth],
+          // Prevent horizontal overflow
+          "min-w-0 box-border",
+          className
+        )}
+      >
+        {children}
+      </div>
     </div>
   );
 }
