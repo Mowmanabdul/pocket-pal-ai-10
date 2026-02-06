@@ -535,9 +535,9 @@
   /* Premium FAB Button */
   .fab-button {
     @apply fixed z-50 w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300;
-    /* Position above the bottom navigation bar */
-    bottom: calc(5rem + env(safe-area-inset-bottom, 0px));
-    right: 1rem;
+    /* Position above the bottom navigation bar with proper offset */
+    bottom: calc(6rem + env(safe-area-inset-bottom, 0px));
+    right: 1.25rem;
     background: linear-gradient(135deg, hsl(var(--gradient-start)), hsl(var(--gradient-end)));
     box-shadow: 
       0 4px 16px hsl(var(--glow-color) / 0.3),
@@ -555,6 +555,12 @@
 
   .fab-button:active {
     transform: scale(0.96);
+  }
+
+  /* Cleaner Card Styles */
+  .card-clean {
+    @apply relative overflow-hidden rounded-xl bg-card border border-border/50;
+    box-shadow: 0 1px 3px hsl(var(--foreground) / 0.02);
   }
 
   /* Premium Icon Container */

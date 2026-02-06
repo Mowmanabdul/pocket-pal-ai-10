@@ -7,7 +7,8 @@ import { ExpenseList } from "@/components/ExpenseList";
 import { ExpenseForm } from "@/components/ExpenseForm";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { Button } from "@/components/ui/button";
-import { Plus, ArrowRight } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Plus, ArrowRight, Wallet, TrendingUp, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -56,14 +57,21 @@ export function DashboardPage() {
   );
 
   return (
-    <PageContainer maxWidth="lg">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl md:text-2xl font-bold text-foreground">{getGreeting()}</h1>
-          <p className="text-sm text-muted-foreground">
-            Total: <span className="font-semibold text-foreground">{formatCurrency(overallTotal, currency)}</span>
-          </p>
+    <PageContainer maxWidth="xl">
+      {/* Header Section */}
+      <div className="flex items-start justify-between gap-4">
+        <div className="space-y-1">
+          <h1 className="text-2xl md:text-3xl font-bold text-foreground tracking-tight">
+            {getGreeting()}
+          </h1>
+          <div className="flex items-center gap-2">
+            <div className="w-5 h-5 rounded-md bg-primary/10 flex items-center justify-center">
+              <Wallet className="w-3 h-3 text-primary" />
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Total tracked: <span className="font-semibold text-foreground">{formatCurrency(overallTotal, currency)}</span>
+            </p>
+          </div>
         </div>
         
         {/* Desktop Add Button */}
@@ -71,7 +79,7 @@ export function DashboardPage() {
           <DialogTrigger asChild>
             <Button 
               size="sm"
-              className="hidden sm:flex rounded-xl h-9 px-4 text-sm font-medium"
+              className="hidden md:flex rounded-xl h-9 px-4 text-sm font-medium shadow-sm"
               onClick={() => setIsOpen(true)}
             >
               <Plus className="w-4 h-4 mr-1.5" />
@@ -87,40 +95,77 @@ export function DashboardPage() {
         </Dialog>
       </div>
 
-      {/* Budget Alerts - Only show when there are alerts */}
+      {/* Budget Alerts */}
       <BudgetAlerts expenses={expenses} />
 
       {/* Stats Cards */}
       <StatsCards expenses={expenses} />
 
-      {/* Main Content Grid */}
-      <div className="grid lg:grid-cols-5 gap-4">
-        {/* Left Column - Charts */}
-        <div className="lg:col-span-3 space-y-4">
-          {/* Spending Chart */}
-          <div className="glass-card-elevated p-4">
-            <h2 className="text-sm font-semibold text-foreground mb-3">Spending by Category</h2>
+      {/* Main Grid - Charts & Recent Activity */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        {/* Spending Chart */}
+        <Card className="lg:col-span-2 border-border/50 shadow-sm">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-semibold flex items-center gap-2">
+              <div className="w-6 h-6 rounded-lg bg-primary/10 flex items-center justify-center">
+                <TrendingUp className="w-3.5 h-3.5 text-primary" />
+              </div>
+              Spending by Category
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0">
             <SpendingChart expenses={expenses} />
-          </div>
+          </CardContent>
+        </Card>
 
-          {/* Budget Progress */}
+        {/* Budget Progress */}
+        <div className="lg:col-span-1">
           <BudgetProgress expenses={expenses} />
         </div>
+      </div>
 
-        {/* Right Column - Recent Activity */}
-        <div className="lg:col-span-2">
-          <div className="glass-card-elevated p-4 h-full">
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-sm font-semibold text-foreground">Recent Activity</h2>
-              {expenses.length > 5 && (
-                <Link to="/expenses">
-                  <Button variant="ghost" size="sm" className="text-primary text-xs h-7 px-2">
-                    View All
-                    <ArrowRight className="w-3 h-3 ml-1" />
-                  </Button>
-                </Link>
-              )}
-            </div>
+      {/* Quick Actions + Recent Activity */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        {/* Quick Actions */}
+        <div className="grid grid-cols-2 gap-3 lg:col-span-1">
+          <Link to="/ai-advisor" className="block">
+            <Card className="h-full border-border/50 hover:border-primary/30 transition-all hover:shadow-md cursor-pointer group">
+              <CardContent className="p-4 flex flex-col items-center justify-center text-center h-full min-h-[100px]">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center mb-2 group-hover:scale-105 transition-transform">
+                  <Sparkles className="w-5 h-5 text-primary" />
+                </div>
+                <p className="text-xs font-medium text-foreground">AI Advisor</p>
+                <p className="text-[10px] text-muted-foreground mt-0.5">Get insights</p>
+              </CardContent>
+            </Card>
+          </Link>
+          <Link to="/analytics" className="block">
+            <Card className="h-full border-border/50 hover:border-primary/30 transition-all hover:shadow-md cursor-pointer group">
+              <CardContent className="p-4 flex flex-col items-center justify-center text-center h-full min-h-[100px]">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-chart-2/20 to-chart-3/20 flex items-center justify-center mb-2 group-hover:scale-105 transition-transform">
+                  <TrendingUp className="w-5 h-5 text-chart-2" />
+                </div>
+                <p className="text-xs font-medium text-foreground">Analytics</p>
+                <p className="text-[10px] text-muted-foreground mt-0.5">View trends</p>
+              </CardContent>
+            </Card>
+          </Link>
+        </div>
+
+        {/* Recent Activity */}
+        <Card className="lg:col-span-2 border-border/50 shadow-sm">
+          <CardHeader className="pb-2 flex flex-row items-center justify-between">
+            <CardTitle className="text-sm font-semibold">Recent Activity</CardTitle>
+            {expenses.length > 5 && (
+              <Link to="/expenses">
+                <Button variant="ghost" size="sm" className="text-primary text-xs h-7 px-2 -mr-2">
+                  View All
+                  <ArrowRight className="w-3 h-3 ml-1" />
+                </Button>
+              </Link>
+            )}
+          </CardHeader>
+          <CardContent className="pt-0">
             {isLoading ? (
               <div className="space-y-2">
                 {[...Array(4)].map((_, i) => (
@@ -129,7 +174,7 @@ export function DashboardPage() {
               </div>
             ) : (
               <ExpenseList
-                expenses={expenses.slice(0, 6)}
+                expenses={expenses.slice(0, 5)}
                 onDelete={(id) => deleteExpense.mutate(id)}
                 onEdit={(expense) => updateExpense.mutate(expense)}
                 onDuplicate={(expense) => addExpense.mutate(expense)}
@@ -139,15 +184,15 @@ export function DashboardPage() {
                 compact
               />
             )}
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Mobile FAB */}
       <Drawer open={isMobile && isOpen} onOpenChange={(open) => isMobile && setIsOpen(open)}>
         <DrawerTrigger asChild>
           <button 
-            className="fab-button sm:hidden"
+            className="fab-button md:hidden"
             onClick={() => setIsOpen(true)}
           >
             <Plus className="w-6 h-6 text-primary-foreground" />

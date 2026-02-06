@@ -7,7 +7,8 @@ import { DateRangePicker } from "@/components/DateRangePicker";
 import { CSVImportDialog } from "@/components/CSVImportDialog";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { Button } from "@/components/ui/button";
-import { Plus, Upload } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Plus, Upload, Receipt } from "lucide-react";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { formatCurrency } from "@/lib/currencies";
 import { DateRange } from "react-day-picker";
@@ -117,13 +118,18 @@ export function ExpensesPage() {
   );
 
   return (
-    <PageContainer maxWidth="md">
+    <PageContainer maxWidth="lg">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl md:text-2xl font-bold text-foreground">Expenses</h1>
+      <div className="flex items-start justify-between gap-4">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center">
+              <Receipt className="w-4 h-4 text-primary" />
+            </div>
+            <h1 className="text-xl md:text-2xl font-bold text-foreground">Expenses</h1>
+          </div>
           <p className="text-sm text-muted-foreground">
-            {filteredExpenses.length} items · <span className="font-medium text-foreground">{formatCurrency(totalAmount, currency)}</span>
+            {filteredExpenses.length} items · <span className="font-semibold text-foreground">{formatCurrency(totalAmount, currency)}</span>
           </p>
         </div>
         
@@ -150,51 +156,58 @@ export function ExpensesPage() {
 
       <CSVImportDialog open={isImportOpen} onOpenChange={setIsImportOpen} />
 
-      {/* Filters */}
-      <div className="glass-card-elevated rounded-xl p-3 space-y-3">
-        <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
-          <DateRangePicker dateRange={dateRange} onDateRangeChange={setDateRange} />
-          <ExpenseFilters
-            search={search}
-            onSearchChange={setSearch}
-            category={category}
-            onCategoryChange={setCategory}
-            sortBy={sortBy}
-            onSortChange={setSortBy}
-          />
-        </div>
-
-        {/* Expense List */}
-        {isLoading ? (
-          <div className="space-y-2">
-            {[...Array(5)].map((_, i) => <div key={i} className="h-14 rounded-lg shimmer" />)}
+      {/* Filters Card */}
+      <Card className="border-border/50 shadow-sm">
+        <CardHeader className="pb-3 pt-4 px-4">
+          <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
+            <DateRangePicker dateRange={dateRange} onDateRangeChange={setDateRange} />
+            <ExpenseFilters
+              search={search}
+              onSearchChange={setSearch}
+              category={category}
+              onCategoryChange={setCategory}
+              sortBy={sortBy}
+              onSortChange={setSortBy}
+            />
           </div>
-        ) : groupedExpenses.length > 0 ? (
-          <div className="space-y-4">
-            {groupedExpenses.map((group) => (
-              <div key={group.label} className="space-y-2">
-                <div className="flex items-center justify-between px-1">
-                  <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{group.label}</h3>
-                  <span className="text-xs font-medium text-foreground">{formatCurrency(group.total, currency)}</span>
+        </CardHeader>
+        <CardContent className="px-4 pb-4 pt-0">
+          {/* Expense List */}
+          {isLoading ? (
+            <div className="space-y-2">
+              {[...Array(5)].map((_, i) => <div key={i} className="h-14 rounded-lg shimmer" />)}
+            </div>
+          ) : groupedExpenses.length > 0 ? (
+            <div className="space-y-5">
+              {groupedExpenses.map((group) => (
+                <div key={group.label} className="space-y-2">
+                  <div className="flex items-center justify-between px-1">
+                    <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{group.label}</h3>
+                    <span className="text-xs font-medium text-foreground">{formatCurrency(group.total, currency)}</span>
+                  </div>
+                  <ExpenseList
+                    expenses={group.expenses}
+                    onDelete={(id) => deleteExpense.mutate(id)}
+                    onEdit={(expense) => updateExpense.mutate(expense)}
+                    onDuplicate={(expense) => addExpense.mutate(expense)}
+                    isDeleting={deleteExpense.isPending}
+                    isUpdating={updateExpense.isPending}
+                    isAdding={addExpense.isPending}
+                  />
                 </div>
-                <ExpenseList
-                  expenses={group.expenses}
-                  onDelete={(id) => deleteExpense.mutate(id)}
-                  onEdit={(expense) => updateExpense.mutate(expense)}
-                  onDuplicate={(expense) => addExpense.mutate(expense)}
-                  isDeleting={deleteExpense.isPending}
-                  isUpdating={updateExpense.isPending}
-                  isAdding={addExpense.isPending}
-                />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <div className="w-12 h-12 rounded-2xl bg-muted/50 flex items-center justify-center mx-auto mb-3">
+                <Receipt className="w-5 h-5 text-muted-foreground" />
               </div>
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground text-sm">No expenses found</p>
-          </div>
-        )}
-      </div>
+              <p className="text-muted-foreground text-sm">No expenses found</p>
+              <p className="text-muted-foreground text-xs mt-1">Try adjusting your filters</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Mobile Drawer */}
       <Drawer open={isMobile && isOpen} onOpenChange={(open) => isMobile && setIsOpen(open)}>

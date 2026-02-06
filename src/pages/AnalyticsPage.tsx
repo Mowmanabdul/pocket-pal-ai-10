@@ -1,6 +1,7 @@
 import { useExpenses } from "@/hooks/useExpenses";
 import { SpendingChart } from "@/components/SpendingChart";
 import { PageContainer } from "@/components/layout/PageContainer";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { formatCurrency } from "@/lib/currencies";
 import { useMemo, useState } from "react";
@@ -11,7 +12,7 @@ import {
   subMonths, 
   format,
 } from "date-fns";
-import { TrendingUp, TrendingDown, DollarSign, Download, ArrowLeftRight } from "lucide-react";
+import { TrendingUp, TrendingDown, DollarSign, Download, ArrowLeftRight, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { exportToPDF, exportToCSV } from "@/lib/pdfExport";
 import { useAIInsights } from "@/hooks/useAIInsights";
@@ -107,7 +108,12 @@ export function AnalyticsPage() {
     <PageContainer maxWidth="xl">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <h1 className="text-xl md:text-2xl font-bold text-foreground">Analytics</h1>
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center">
+            <BarChart3 className="w-4 h-4 text-primary" />
+          </div>
+          <h1 className="text-xl md:text-2xl font-bold text-foreground">Analytics</h1>
+        </div>
         <div className="flex items-center gap-2 flex-wrap">
           <Button
             onClick={() => setViewMode(viewMode === "analytics" ? "compare" : "analytics")}
@@ -133,65 +139,81 @@ export function AnalyticsPage() {
       </div>
 
       {viewMode === "compare" ? (
-        <div className="glass-card-elevated p-4">
-          <MonthComparison expenses={allExpenses} />
-        </div>
+        <Card className="border-border/50 shadow-sm">
+          <CardContent className="p-4 md:p-6">
+            <MonthComparison expenses={allExpenses} />
+          </CardContent>
+        </Card>
       ) : (
         <>
-          {/* Key Metrics - Simplified */}
+          {/* Key Metrics */}
           <div className="grid grid-cols-3 gap-3">
-            <div className="glass-card-elevated p-3 md:p-4">
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-[10px] md:text-xs text-muted-foreground font-medium uppercase tracking-wide">Total</span>
-                <DollarSign className="w-3.5 h-3.5 text-primary" />
-              </div>
-              <p className="text-lg md:text-2xl font-bold text-foreground">{formatCurrency(totalSpent, currency)}</p>
-            </div>
+            <Card className="border-border/50 shadow-sm">
+              <CardContent className="p-3 md:p-4">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-[10px] md:text-xs text-muted-foreground font-medium uppercase tracking-wide">Total</span>
+                  <DollarSign className="w-3.5 h-3.5 text-primary" />
+                </div>
+                <p className="text-lg md:text-2xl font-bold text-foreground">{formatCurrency(totalSpent, currency)}</p>
+              </CardContent>
+            </Card>
 
-            <div className="glass-card-elevated p-3 md:p-4">
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-[10px] md:text-xs text-muted-foreground font-medium uppercase tracking-wide">Trend</span>
-                {monthChange <= 0 ? <TrendingDown className="w-3.5 h-3.5 text-success" /> : <TrendingUp className="w-3.5 h-3.5 text-warning" />}
-              </div>
-              <p className={`text-lg md:text-2xl font-bold ${monthChange <= 0 ? 'text-success' : 'text-warning'}`}>
-                {monthChange >= 0 ? '+' : ''}{monthChange.toFixed(0)}%
-              </p>
-            </div>
+            <Card className="border-border/50 shadow-sm">
+              <CardContent className="p-3 md:p-4">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-[10px] md:text-xs text-muted-foreground font-medium uppercase tracking-wide">Trend</span>
+                  {monthChange <= 0 ? <TrendingDown className="w-3.5 h-3.5 text-success" /> : <TrendingUp className="w-3.5 h-3.5 text-warning" />}
+                </div>
+                <p className={`text-lg md:text-2xl font-bold ${monthChange <= 0 ? 'text-success' : 'text-warning'}`}>
+                  {monthChange >= 0 ? '+' : ''}{monthChange.toFixed(0)}%
+                </p>
+              </CardContent>
+            </Card>
 
-            <div className="glass-card-elevated p-3 md:p-4">
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-[10px] md:text-xs text-muted-foreground font-medium uppercase tracking-wide">Average</span>
-              </div>
-              <p className="text-lg md:text-2xl font-bold text-foreground">{formatCurrency(avgPerExpense, currency)}</p>
-            </div>
+            <Card className="border-border/50 shadow-sm">
+              <CardContent className="p-3 md:p-4">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-[10px] md:text-xs text-muted-foreground font-medium uppercase tracking-wide">Average</span>
+                </div>
+                <p className="text-lg md:text-2xl font-bold text-foreground">{formatCurrency(avgPerExpense, currency)}</p>
+              </CardContent>
+            </Card>
           </div>
 
-          {/* Charts - 2 Column Layout */}
+          {/* Charts Row */}
           <div className="grid lg:grid-cols-2 gap-4">
             {/* Category Breakdown */}
-            <div className="glass-card-elevated p-4">
-              <h2 className="text-sm font-semibold text-foreground mb-3">By Category</h2>
-              <SpendingChart expenses={expenses} />
-            </div>
+            <Card className="border-border/50 shadow-sm">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-semibold">By Category</CardTitle>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <SpendingChart expenses={expenses} />
+              </CardContent>
+            </Card>
 
             {/* Monthly Trend */}
-            <div className="glass-card-elevated p-4">
-              <h2 className="text-sm font-semibold text-foreground mb-3">6-Month Trend</h2>
-              <div className="h-[200px] -mx-2">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={monthlyData} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
-                    <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" fontSize={10} tickLine={false} axisLine={false} />
-                    <YAxis stroke="hsl(var(--muted-foreground))" fontSize={10} tickLine={false} axisLine={false} tickFormatter={(v) => v === 0 ? "0" : `${currency.symbol}${v >= 1000 ? `${(v/1000).toFixed(0)}k` : v}`} width={40} />
-                    <Tooltip
-                      contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: "12px", fontSize: "12px" }}
-                      formatter={(value: number) => [formatCurrency(value, currency), "Spent"]}
-                    />
-                    <Bar dataKey="amount" fill="hsl(var(--primary))" radius={[6, 6, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
+            <Card className="border-border/50 shadow-sm">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-semibold">6-Month Trend</CardTitle>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <div className="h-[200px] -mx-2">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={monthlyData} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                      <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" fontSize={10} tickLine={false} axisLine={false} />
+                      <YAxis stroke="hsl(var(--muted-foreground))" fontSize={10} tickLine={false} axisLine={false} tickFormatter={(v) => v === 0 ? "0" : `${currency.symbol}${v >= 1000 ? `${(v/1000).toFixed(0)}k` : v}`} width={40} />
+                      <Tooltip
+                        contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: "12px", fontSize: "12px" }}
+                        formatter={(value: number) => [formatCurrency(value, currency), "Spent"]}
+                      />
+                      <Bar dataKey="amount" fill="hsl(var(--primary))" radius={[6, 6, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
           {/* Insights Row */}
