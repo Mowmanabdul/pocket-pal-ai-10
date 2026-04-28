@@ -8,11 +8,14 @@ import { CSVImportDialog } from "@/components/CSVImportDialog";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Upload, Receipt } from "lucide-react";
+import { Plus, Upload, Receipt, Download } from "lucide-react";
 import { useCurrency } from "@/contexts/CurrencyContext";
+import { useCategoryLabelsContext } from "@/contexts/CategoryLabelsContext";
 import { formatCurrency } from "@/lib/currencies";
 import { DateRange } from "react-day-picker";
-import { isWithinInterval, isToday, isYesterday, isThisWeek, isThisMonth } from "date-fns";
+import { isWithinInterval, isToday, isYesterday, isThisWeek, isThisMonth, startOfWeek, startOfMonth, endOfDay } from "date-fns";
+import { exportToCSV } from "@/lib/pdfExport";
+import { cn } from "@/lib/utils";
 import {
   Dialog,
   DialogContent,
@@ -30,9 +33,12 @@ import {
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Expense } from "@/lib/types";
 
+type QuickRange = "all" | "today" | "week" | "month";
+
 export function ExpensesPage() {
   const { expenses, isLoading, addExpense, updateExpense, deleteExpense } = useExpenses();
   const { currency } = useCurrency();
+  const { getCategoryConfig } = useCategoryLabelsContext();
   const isMobile = useIsMobile();
   const [isOpen, setIsOpen] = useState(false);
   const [isImportOpen, setIsImportOpen] = useState(false);
@@ -40,6 +46,17 @@ export function ExpensesPage() {
   const [category, setCategory] = useState("all");
   const [sortBy, setSortBy] = useState("date-desc");
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
+  const [quickRange, setQuickRange] = useState<QuickRange>("all");
+
+  // Apply quick range to dateRange
+  const applyQuickRange = (range: QuickRange) => {
+    setQuickRange(range);
+    const now = new Date();
+    if (range === "all") setDateRange(undefined);
+    else if (range === "today") setDateRange({ from: now, to: endOfDay(now) });
+    else if (range === "week") setDateRange({ from: startOfWeek(now, { weekStartsOn: 1 }), to: endOfDay(now) });
+    else if (range === "month") setDateRange({ from: startOfMonth(now), to: endOfDay(now) });
+  };
 
   const filteredExpenses = useMemo(() => {
     let result = [...expenses];
