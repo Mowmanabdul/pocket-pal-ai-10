@@ -120,17 +120,6 @@ export function RecurringPage() {
         </div>
       </div>
 
-      {/* List Card */}
-      <Card className="border-border/50 shadow-sm">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-semibold">Subscriptions & Bills</CardTitle>
-        </CardHeader>
-        <CardContent className="pt-0">
-          {isLoading ? (
-            <div className="space-y-2">
-              {[...Array(3)].map((_, i) => <div key={i} className="h-14 rounded-lg shimmer" />)}
-      </div>
-
       {/* Upcoming summary */}
       {!isLoading && allRecurringExpenses.length > 0 && (
         <div className="grid grid-cols-2 gap-3">
@@ -173,6 +162,17 @@ export function RecurringPage() {
           </Card>
         </div>
       )}
+
+      {/* List Card */}
+      <Card className="border-border/50 shadow-sm">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm font-semibold">Subscriptions & Bills</CardTitle>
+        </CardHeader>
+        <CardContent className="pt-0">
+          {isLoading ? (
+            <div className="space-y-2">
+              {[...Array(3)].map((_, i) => <div key={i} className="h-14 rounded-lg shimmer" />)}
+            </div>
           ) : (
             <RecurringExpensesList
               expenses={recurringExpenses}
