@@ -7,7 +7,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DateRangePicker } from "@/components/DateRangePicker";
 import { DateRange } from "react-day-picker";
-import { isWithinInterval } from "date-fns";
+import { isWithinInterval, addDays } from "date-fns";
+import { useCurrency } from "@/contexts/CurrencyContext";
+import { formatCurrency } from "@/lib/currencies";
+import { CalendarClock } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -18,6 +21,7 @@ import {
 import { Plus, Play, Loader2, RefreshCw } from "lucide-react";
 
 export function RecurringPage() {
+  const { currency } = useCurrency();
   const {
     recurringExpenses: allRecurringExpenses,
     isLoading,
