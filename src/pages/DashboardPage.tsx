@@ -8,7 +8,8 @@ import { ExpenseForm } from "@/components/ExpenseForm";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, ArrowRight, Wallet, TrendingUp, Sparkles } from "lucide-react";
+import { Plus, ArrowRight, Wallet, TrendingUp } from "lucide-react";
+import { WeeklySummary } from "@/components/WeeklySummary";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -61,17 +62,17 @@ export function DashboardPage() {
       {/* Header Section */}
       <div className="flex items-start justify-between gap-4">
         <div className="space-y-1">
-          <h1 className="text-2xl md:text-3xl font-bold text-foreground tracking-tight">
-            {getGreeting()}
-          </h1>
           <div className="flex items-center gap-2">
-            <div className="w-5 h-5 rounded-md bg-primary/10 flex items-center justify-center">
-              <Wallet className="w-3 h-3 text-primary" />
+            <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center">
+              <Wallet className="w-4 h-4 text-primary" />
             </div>
-            <p className="text-sm text-muted-foreground">
-              Total tracked: <span className="font-semibold text-foreground">{formatCurrency(overallTotal, currency)}</span>
-            </p>
+            <h1 className="text-xl md:text-2xl font-bold text-foreground">
+              {getGreeting()}
+            </h1>
           </div>
+          <p className="text-sm text-muted-foreground">
+            Total tracked · <span className="font-semibold text-foreground">{formatCurrency(overallTotal, currency)}</span>
+          </p>
         </div>
         
         {/* Desktop Add Button */}
@@ -124,32 +125,10 @@ export function DashboardPage() {
         </div>
       </div>
 
-      {/* Quick Actions + Recent Activity */}
+      {/* Weekly Summary + Recent Activity */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* Quick Actions */}
-        <div className="grid grid-cols-2 gap-3 lg:col-span-1">
-          <Link to="/ai-advisor" className="block">
-            <Card className="h-full border-border/50 hover:border-primary/30 transition-all hover:shadow-md cursor-pointer group">
-              <CardContent className="p-4 flex flex-col items-center justify-center text-center h-full min-h-[100px]">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center mb-2 group-hover:scale-105 transition-transform">
-                  <Sparkles className="w-5 h-5 text-primary" />
-                </div>
-                <p className="text-xs font-medium text-foreground">AI Advisor</p>
-                <p className="text-[10px] text-muted-foreground mt-0.5">Get insights</p>
-              </CardContent>
-            </Card>
-          </Link>
-          <Link to="/analytics" className="block">
-            <Card className="h-full border-border/50 hover:border-primary/30 transition-all hover:shadow-md cursor-pointer group">
-              <CardContent className="p-4 flex flex-col items-center justify-center text-center h-full min-h-[100px]">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-chart-2/20 to-chart-3/20 flex items-center justify-center mb-2 group-hover:scale-105 transition-transform">
-                  <TrendingUp className="w-5 h-5 text-chart-2" />
-                </div>
-                <p className="text-xs font-medium text-foreground">Analytics</p>
-                <p className="text-[10px] text-muted-foreground mt-0.5">View trends</p>
-              </CardContent>
-            </Card>
-          </Link>
+        <div className="lg:col-span-1">
+          <WeeklySummary expenses={expenses} />
         </div>
 
         {/* Recent Activity */}

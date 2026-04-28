@@ -6,6 +6,8 @@ import { useCurrency } from "@/contexts/CurrencyContext";
 import { useCategoryLabelsContext } from "@/contexts/CategoryLabelsContext";
 import { formatCurrency } from "@/lib/currencies";
 import { Card, CardContent } from "@/components/ui/card";
+import { Link } from "react-router-dom";
+import { cn } from "@/lib/utils";
 
 interface StatsCardsProps {
   expenses: Expense[];
@@ -63,10 +65,11 @@ export function StatsCards({ expenses }: StatsCardsProps) {
     {
       label: "This Month",
       value: formatCurrency(stats.thisMonthTotal, currency),
-      subtitle: "Total spending",
+      subtitle: `${stats.transactionCount} transactions`,
       icon: Wallet,
       iconBg: "bg-primary/10",
       iconColor: "text-primary",
+      href: "/expenses",
     },
     {
       label: "vs Last Month",
@@ -82,6 +85,7 @@ export function StatsCards({ expenses }: StatsCardsProps) {
           <ArrowUpRight className="w-3 h-3 text-warning" />
         </div>
       ),
+      href: "/analytics",
     },
     {
       label: "Daily Avg",
@@ -90,6 +94,7 @@ export function StatsCards({ expenses }: StatsCardsProps) {
       icon: Target,
       iconBg: "bg-chart-2/10",
       iconColor: "text-chart-2",
+      href: "/analytics",
     },
     {
       label: "Top Category",
@@ -99,44 +104,55 @@ export function StatsCards({ expenses }: StatsCardsProps) {
       iconBg: "bg-chart-3/10",
       iconColor: "text-chart-3",
       categoryDot: stats.topCategory ? getCategoryConfig(stats.topCategory.category).color : null,
+      href: "/analytics",
     },
   ];
 
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-      {cards.map((card, index) => (
-        <Card key={index} className="border-border/50 shadow-sm overflow-hidden">
-          <CardContent className="p-3 md:p-4">
-            <div className="flex items-start justify-between gap-2">
-              <div className="min-w-0 flex-1 space-y-1">
-                <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
-                  {card.label}
-                </p>
-                <div className="flex items-center gap-1.5">
-                  {card.categoryDot && (
-                    <span 
-                      className="w-2 h-2 rounded-full shrink-0"
-                      style={{ backgroundColor: card.categoryDot }}
-                    />
-                  )}
-                  <p className={`text-lg md:text-xl font-bold truncate tracking-tight ${card.valueColor || 'text-foreground'}`}>
-                    {card.value}
+      {cards.map((card, index) => {
+        const content = (
+          <Card className={cn(
+            "border-border/50 shadow-sm overflow-hidden h-full transition-all",
+            card.href && "hover:border-primary/30 hover:shadow-md cursor-pointer"
+          )}>
+            <CardContent className="p-3 md:p-4">
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0 flex-1 space-y-1">
+                  <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
+                    {card.label}
                   </p>
-                  {card.badge}
+                  <div className="flex items-center gap-1.5">
+                    {card.categoryDot && (
+                      <span
+                        className="w-2 h-2 rounded-full shrink-0"
+                        style={{ backgroundColor: card.categoryDot }}
+                      />
+                    )}
+                    <p className={`text-lg md:text-xl font-bold truncate tracking-tight ${card.valueColor || 'text-foreground'}`}>
+                      {card.value}
+                    </p>
+                    {card.badge}
+                  </div>
+                  <p className="text-[10px] text-muted-foreground font-medium truncate">
+                    {card.subtitle}
+                  </p>
                 </div>
-                <p className="text-[10px] text-muted-foreground font-medium truncate">
-                  {card.subtitle}
-                </p>
+                {card.icon && (
+                  <div className={`w-9 h-9 rounded-xl ${card.iconBg} flex items-center justify-center shrink-0`}>
+                    <card.icon className={`w-4 h-4 ${card.iconColor}`} />
+                  </div>
+                )}
               </div>
-              {card.icon && (
-                <div className={`w-9 h-9 rounded-xl ${card.iconBg} flex items-center justify-center shrink-0`}>
-                  <card.icon className={`w-4 h-4 ${card.iconColor}`} />
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      ))}
+            </CardContent>
+          </Card>
+        );
+        return card.href ? (
+          <Link to={card.href} key={index} className="block">{content}</Link>
+        ) : (
+          <div key={index}>{content}</div>
+        );
+      })}
     </div>
   );
 }
