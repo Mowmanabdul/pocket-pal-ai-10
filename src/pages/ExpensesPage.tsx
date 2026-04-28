@@ -152,6 +152,15 @@ export function ExpensesPage() {
         
         {/* Desktop Actions */}
         <div className="hidden md:flex items-center gap-2">
+          <Button
+            size="sm"
+            variant="outline"
+            className="rounded-xl text-xs h-8"
+            onClick={() => exportToCSV({ expenses: filteredExpenses, currency, getCategoryConfig })}
+            disabled={filteredExpenses.length === 0}
+          >
+            <Download className="w-3.5 h-3.5 mr-1.5" />Export
+          </Button>
           <Button size="sm" variant="outline" className="rounded-xl text-xs h-8" onClick={() => setIsImportOpen(true)}>
             <Upload className="w-3.5 h-3.5 mr-1.5" />Import
           </Button>
@@ -172,6 +181,29 @@ export function ExpensesPage() {
       </div>
 
       <CSVImportDialog open={isImportOpen} onOpenChange={setIsImportOpen} />
+
+      {/* Quick date range chips */}
+      <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-hide -mx-1 px-1">
+        {([
+          { key: "all", label: "All time" },
+          { key: "today", label: "Today" },
+          { key: "week", label: "This week" },
+          { key: "month", label: "This month" },
+        ] as const).map((chip) => (
+          <button
+            key={chip.key}
+            onClick={() => applyQuickRange(chip.key)}
+            className={cn(
+              "px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all border",
+              quickRange === chip.key
+                ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                : "bg-secondary/60 text-muted-foreground border-transparent hover:bg-secondary"
+            )}
+          >
+            {chip.label}
+          </button>
+        ))}
+      </div>
 
       {/* Filters Card */}
       <Card className="border-border/50 shadow-sm">
