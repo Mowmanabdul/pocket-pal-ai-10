@@ -48,6 +48,29 @@ export function RecurringPage() {
 
   const activeCount = recurringExpenses.filter(e => e.is_active).length;
 
+  // Upcoming next 7 days summary
+  const upcoming = useMemo(() => {
+    const now = new Date();
+    const horizon = addDays(now, 7);
+    const items = allRecurringExpenses.filter((e) => {
+      if (!e.is_active) return false;
+      const next = new Date(e.next_occurrence);
+      return next >= now && next <= horizon;
+    });
+    const total = items.reduce((sum, e) => sum + Number(e.amount), 0);
+    return { count: items.length, total };
+  }, [allRecurringExpenses]);
+
+  // Monthly committed total (active recurring, normalized to monthly)
+  const monthlyCommitted = useMemo(() => {
+    return allRecurringExpenses
+      .filter((e) => e.is_active)
+      .reduce((sum, e) => {
+        const amt = Number(e.amount);
+        return sum + (e.frequency === "weekly" ? amt * 4.33 : amt);
+      }, 0);
+  }, [allRecurringExpenses]);
+
   return (
     <PageContainer maxWidth="lg">
       {/* Header */}
@@ -106,7 +129,50 @@ export function RecurringPage() {
           {isLoading ? (
             <div className="space-y-2">
               {[...Array(3)].map((_, i) => <div key={i} className="h-14 rounded-lg shimmer" />)}
-            </div>
+      </div>
+
+      {/* Upcoming summary */}
+      {!isLoading && allRecurringExpenses.length > 0 && (
+        <div className="grid grid-cols-2 gap-3">
+          <Card className="border-border/50 shadow-sm">
+            <CardContent className="p-3 md:p-4">
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0 flex-1 space-y-1">
+                  <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Next 7 days</p>
+                  <p className="text-lg md:text-xl font-bold text-foreground tracking-tight">
+                    {formatCurrency(upcoming.total, currency)}
+                  </p>
+                  <p className="text-[10px] text-muted-foreground font-medium">
+                    {upcoming.count} {upcoming.count === 1 ? "payment" : "payments"} due
+                  </p>
+                </div>
+                <div className="w-9 h-9 rounded-xl bg-warning/10 flex items-center justify-center shrink-0">
+                  <CalendarClock className="w-4 h-4 text-warning" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-border/50 shadow-sm">
+            <CardContent className="p-3 md:p-4">
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0 flex-1 space-y-1">
+                  <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Monthly committed</p>
+                  <p className="text-lg md:text-xl font-bold text-foreground tracking-tight">
+                    {formatCurrency(monthlyCommitted, currency)}
+                  </p>
+                  <p className="text-[10px] text-muted-foreground font-medium">
+                    {activeCount} active subscriptions
+                  </p>
+                </div>
+                <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                  <RefreshCw className="w-4 h-4 text-primary" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
           ) : (
             <RecurringExpensesList
               expenses={recurringExpenses}
