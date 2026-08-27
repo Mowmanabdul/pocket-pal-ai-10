@@ -128,6 +128,19 @@ export function RecurringExpensesList({
                   disabled={isToggling}
                   className="scale-90"
                 />
+
+                {onEdit && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => onEdit(expense)}
+                    aria-label="Edit recurring expense"
+                    className="h-7 w-7 text-muted-foreground hover:text-primary hover:bg-primary/10"
+                  >
+                    <Pencil className="w-3.5 h-3.5" />
+                  </Button>
+                )}
+                
                 
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
