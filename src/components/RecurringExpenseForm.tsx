@@ -54,20 +54,28 @@ interface RecurringExpenseFormProps {
   }) => void;
   isLoading?: boolean;
   onCancel?: () => void;
+  initialValues?: {
+    amount: number;
+    category: ExpenseCategory;
+    description?: string | null;
+    frequency: RecurringFrequency;
+    start_date: string;
+  };
+  mode?: "create" | "edit";
 }
 
-export function RecurringExpenseForm({ onSubmit, isLoading, onCancel }: RecurringExpenseFormProps) {
+export function RecurringExpenseForm({ onSubmit, isLoading, onCancel, initialValues, mode = "create" }: RecurringExpenseFormProps) {
   const { currency } = useCurrency();
   const { getCategoryConfig } = useCategoryLabelsContext();
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      amount: "",
-      category: "other",
-      description: "",
-      frequency: "monthly",
-      start_date: new Date().toISOString().split("T")[0],
+      amount: initialValues ? String(initialValues.amount) : "",
+      category: initialValues?.category ?? "other",
+      description: initialValues?.description ?? "",
+      frequency: initialValues?.frequency ?? "monthly",
+      start_date: initialValues?.start_date ?? new Date().toISOString().split("T")[0],
     },
   });
 
@@ -79,7 +87,7 @@ export function RecurringExpenseForm({ onSubmit, isLoading, onCancel }: Recurrin
       frequency: data.frequency,
       start_date: data.start_date,
     });
-    form.reset();
+    if (mode === "create") form.reset();
   };
 
   return (
