@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { useRecurringExpenses } from "@/hooks/useRecurringExpenses";
+import { useRecurringExpenses, RecurringExpense } from "@/hooks/useRecurringExpenses";
 import { RecurringExpenseForm } from "@/components/RecurringExpenseForm";
 import { RecurringExpensesList } from "@/components/RecurringExpensesList";
 import { PageContainer } from "@/components/layout/PageContainer";
