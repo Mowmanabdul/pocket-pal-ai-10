@@ -9,9 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { 
   Trash2, 
   RefreshCw, 
-  Calendar, 
-  Pause, 
-  Play,
+  Pencil,
   Clock
 } from "lucide-react";
 import {
@@ -30,6 +28,7 @@ interface RecurringExpensesListProps {
   expenses: RecurringExpense[];
   onDelete: (id: string) => void;
   onToggleActive: (id: string, isActive: boolean) => void;
+  onEdit?: (expense: RecurringExpense) => void;
   isDeleting?: boolean;
   isToggling?: boolean;
 }
@@ -38,6 +37,7 @@ export function RecurringExpensesList({
   expenses, 
   onDelete, 
   onToggleActive,
+  onEdit,
   isDeleting,
   isToggling 
 }: RecurringExpensesListProps) {
