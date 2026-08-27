@@ -226,10 +226,10 @@ export function RecurringExpenseForm({ onSubmit, isLoading, onCancel, initialVal
             {isLoading ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Adding...
+                {mode === "edit" ? "Saving..." : "Adding..."}
               </>
             ) : (
-              "Add Recurring"
+              mode === "edit" ? "Save Changes" : "Add Recurring"
             )}
           </Button>
         </div>
