@@ -26,12 +26,14 @@ export function RecurringPage() {
     recurringExpenses: allRecurringExpenses,
     isLoading,
     addRecurringExpense,
+    updateRecurringExpense,
     deleteRecurringExpense,
     toggleActive,
     processRecurring,
   } = useRecurringExpenses();
   
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editing, setEditing] = useState<RecurringExpense | null>(null);
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
 
   const recurringExpenses = useMemo(() => {
