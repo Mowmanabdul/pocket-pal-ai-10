@@ -9,9 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { 
   Trash2, 
   RefreshCw, 
-  Calendar, 
-  Pause, 
-  Play,
+  Pencil,
   Clock
 } from "lucide-react";
 import {
@@ -30,6 +28,7 @@ interface RecurringExpensesListProps {
   expenses: RecurringExpense[];
   onDelete: (id: string) => void;
   onToggleActive: (id: string, isActive: boolean) => void;
+  onEdit?: (expense: RecurringExpense) => void;
   isDeleting?: boolean;
   isToggling?: boolean;
 }
@@ -38,6 +37,7 @@ export function RecurringExpensesList({
   expenses, 
   onDelete, 
   onToggleActive,
+  onEdit,
   isDeleting,
   isToggling 
 }: RecurringExpensesListProps) {
@@ -128,6 +128,19 @@ export function RecurringExpensesList({
                   disabled={isToggling}
                   className="scale-90"
                 />
+
+                {onEdit && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => onEdit(expense)}
+                    aria-label="Edit recurring expense"
+                    className="h-7 w-7 text-muted-foreground hover:text-primary hover:bg-primary/10"
+                  >
+                    <Pencil className="w-3.5 h-3.5" />
+                  </Button>
+                )}
+                
                 
                 <AlertDialog>
                   <AlertDialogTrigger asChild>

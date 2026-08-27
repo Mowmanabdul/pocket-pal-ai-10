@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { useRecurringExpenses } from "@/hooks/useRecurringExpenses";
+import { useRecurringExpenses, RecurringExpense } from "@/hooks/useRecurringExpenses";
 import { RecurringExpenseForm } from "@/components/RecurringExpenseForm";
 import { RecurringExpensesList } from "@/components/RecurringExpensesList";
 import { PageContainer } from "@/components/layout/PageContainer";
@@ -26,12 +26,14 @@ export function RecurringPage() {
     recurringExpenses: allRecurringExpenses,
     isLoading,
     addRecurringExpense,
+    updateRecurringExpense,
     deleteRecurringExpense,
     toggleActive,
     processRecurring,
   } = useRecurringExpenses();
   
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editing, setEditing] = useState<RecurringExpense | null>(null);
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
 
   const recurringExpenses = useMemo(() => {
@@ -178,12 +180,48 @@ export function RecurringPage() {
               expenses={recurringExpenses}
               onDelete={(id) => deleteRecurringExpense.mutate(id)}
               onToggleActive={(id, isActive) => toggleActive.mutate({ id, is_active: isActive })}
+              onEdit={(expense) => setEditing(expense)}
               isDeleting={deleteRecurringExpense.isPending}
               isToggling={toggleActive.isPending}
             />
           )}
         </CardContent>
       </Card>
+
+      {/* Edit dialog */}
+      <Dialog open={!!editing} onOpenChange={(open) => !open && setEditing(null)}>
+        <DialogContent className="sm:max-w-md rounded-2xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-bold">Edit Recurring Expense</DialogTitle>
+          </DialogHeader>
+          {editing && (
+            <RecurringExpenseForm
+              mode="edit"
+              initialValues={{
+                amount: Number(editing.amount),
+                category: editing.category,
+                description: editing.description,
+                frequency: editing.frequency,
+                start_date: editing.start_date,
+              }}
+              onSubmit={(data) => {
+                updateRecurringExpense.mutate({
+                  id: editing.id,
+                  amount: data.amount,
+                  category: data.category,
+                  description: data.description ?? null,
+                  frequency: data.frequency,
+                  start_date: data.start_date,
+                  next_occurrence: data.start_date,
+                });
+                setEditing(null);
+              }}
+              isLoading={updateRecurringExpense.isPending}
+              onCancel={() => setEditing(null)}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </PageContainer>
   );
 }
