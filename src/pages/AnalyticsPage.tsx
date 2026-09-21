@@ -40,6 +40,7 @@ export function AnalyticsPage() {
   const { insights: aiInsights } = useAIInsights();
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   const [viewMode, setViewMode] = useState<"analytics" | "compare">("analytics");
+  const { contributions, totalSaved } = useSavings();
 
   // Filter expenses by date range
   const expenses = useMemo(() => {
@@ -77,13 +78,15 @@ export function AnalyticsPage() {
       months.push({
         month: format(date, "MMM"),
         amount: monthExpenses.reduce((sum, e) => sum + Number(e.amount), 0),
+        saved: sumContributions(contributions, start, end),
       });
     }
     return months;
-  }, [allExpenses]);
+  }, [allExpenses, contributions]);
 
   const totalSpent = expenses.reduce((sum, e) => sum + Number(e.amount), 0);
   const avgPerExpense = expenses.length > 0 ? totalSpent / expenses.length : 0;
+  const savingsRate = totalSaved + totalSpent > 0 ? (totalSaved / (totalSaved + totalSpent)) * 100 : 0;
 
   // Month over month change
   const monthChange = useMemo(() => {
