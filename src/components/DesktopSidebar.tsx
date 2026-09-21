@@ -1,4 +1,4 @@
-import { Receipt, Sparkles, TrendingUp, Wallet, LogOut, Home, ChevronLeft, ChevronRight, RefreshCw } from "lucide-react";
+import { Receipt, Sparkles, TrendingUp, Wallet, LogOut, Home, ChevronLeft, ChevronRight, RefreshCw, PiggyBank } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,7 @@ const menuItems = [
   { title: "Dashboard", url: "/", icon: Home },
   { title: "Expenses", url: "/expenses", icon: Receipt },
   { title: "Recurring", url: "/recurring", icon: RefreshCw },
+  { title: "Savings", url: "/savings", icon: PiggyBank },
   { title: "Analytics", url: "/analytics", icon: TrendingUp },
   { title: "AI Advisor", url: "/ai-advisor", icon: Sparkles },
 ];
