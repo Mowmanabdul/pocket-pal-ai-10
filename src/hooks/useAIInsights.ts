@@ -3,6 +3,7 @@ import { Expense, ExpenseCategory } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { useCategoryLabelsContext } from "@/contexts/CategoryLabelsContext";
+import { useSavings } from "@/hooks/useSavings";
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-insights`;
 
@@ -17,6 +18,7 @@ export function useAIInsights() {
   const { toast } = useToast();
   const { currency } = useCurrency();
   const { getCategoryLabel } = useCategoryLabelsContext();
+  const { goalsWithProgress, totalSaved, totalTarget } = useSavings();
 
   const getInsights = async (expenses: Expense[]) => {
     if (expenses.length === 0) {
@@ -55,6 +57,19 @@ export function useAIInsights() {
             name: currency.name,
           },
           categoryLabels,
+          savings: {
+            totalSaved,
+            totalTarget,
+            goals: goalsWithProgress
+              .filter((g) => !g.is_archived)
+              .map((g) => ({
+                name: g.name,
+                target: Number(g.target_amount),
+                saved: g.saved,
+                progress: Math.round(g.progress),
+                targetDate: g.target_date,
+              })),
+          },
         }),
       });
 
