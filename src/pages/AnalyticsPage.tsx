@@ -22,6 +22,8 @@ import { MonthComparison } from "@/components/MonthComparison";
 import { SpendingVelocity } from "@/components/analytics/SpendingVelocity";
 import { TopExpenses } from "@/components/analytics/TopExpenses";
 import { SavingsSuggestions } from "@/components/analytics/SavingsSuggestions";
+import { useSavings, sumContributions } from "@/hooks/useSavings";
+import { PiggyBank } from "lucide-react";
 import {
   BarChart,
   Bar,
