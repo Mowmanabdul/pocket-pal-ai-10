@@ -1,11 +1,11 @@
-import { Receipt, Sparkles, TrendingUp, Home, RefreshCw } from "lucide-react";
+import { Receipt, Sparkles, TrendingUp, Home, PiggyBank } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
 const menuItems = [
   { title: "Home", url: "/", icon: Home },
   { title: "Expenses", url: "/expenses", icon: Receipt },
-  { title: "Recurring", url: "/recurring", icon: RefreshCw },
+  { title: "Savings", url: "/savings", icon: PiggyBank },
   { title: "AI", url: "/ai-advisor", icon: Sparkles },
   { title: "Analytics", url: "/analytics", icon: TrendingUp },
 ];
