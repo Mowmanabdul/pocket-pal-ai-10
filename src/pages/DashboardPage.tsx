@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, ArrowRight, Wallet, TrendingUp } from "lucide-react";
 import { WeeklySummary } from "@/components/WeeklySummary";
+import { SavingsSummaryCard } from "@/components/SavingsSummaryCard";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -125,14 +126,15 @@ export function DashboardPage() {
         </div>
       </div>
 
-      {/* Weekly Summary + Recent Activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <div className="lg:col-span-1">
-          <WeeklySummary expenses={expenses} />
-        </div>
+      {/* Weekly Summary + Savings */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <WeeklySummary expenses={expenses} />
+        <SavingsSummaryCard />
+      </div>
 
-        {/* Recent Activity */}
-        <Card className="lg:col-span-2 border-border/50 shadow-sm">
+      {/* Recent Activity */}
+      <div className="grid grid-cols-1">
+        <Card className="border-border/50 shadow-sm">
           <CardHeader className="pb-2 flex flex-row items-center justify-between">
             <CardTitle className="text-sm font-semibold">Recent Activity</CardTitle>
             {expenses.length > 5 && (
