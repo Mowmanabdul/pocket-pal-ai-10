@@ -31,6 +31,7 @@ const suggestedQuestions = [
 export function AIChatPanel({ expenses }: AIChatPanelProps) {
   const { currency } = useCurrency();
   const { getCategoryLabel } = useCategoryLabelsContext();
+  const { goalsWithProgress, totalSaved, totalTarget } = useSavings();
   const {
     messages,
     isLoading: isLoadingHistory,
@@ -123,6 +124,11 @@ export function AIChatPanel({ expenses }: AIChatPanelProps) {
 - All-time total: ${currency.symbol}${totalExpenses.toFixed(2)}
 - This month's total: ${currency.symbol}${thisMonthTotal.toFixed(2)}
 - Spending by category: ${Object.entries(categoryTotals).map(([k, v]) => `${getCategoryLabel(k as ExpenseCategory)}: ${currency.symbol}${v.toFixed(2)}`).join(", ")}
+
+SAVINGS:
+- Total saved: ${currency.symbol}${totalSaved.toFixed(2)} of ${currency.symbol}${totalTarget.toFixed(2)} in goals
+- Goals: ${goalsWithProgress.filter(g => !g.is_archived).map(g => `${g.name}: ${currency.symbol}${g.saved.toFixed(2)}/${currency.symbol}${Number(g.target_amount).toFixed(2)} (${g.progress.toFixed(0)}%${g.target_date ? `, by ${g.target_date}` : ""})`).join("; ") || "none set"}
+
 
 RECENT TRANSACTIONS:
 ${expenseContext.slice(0, 15).map(e => `- ${e.date}: ${e.categoryLabel} - ${currency.symbol}${e.amount} ${e.description ? `(${e.description})` : ""}`).join("\n")}
