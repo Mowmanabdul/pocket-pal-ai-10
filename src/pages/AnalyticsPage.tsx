@@ -152,7 +152,7 @@ export function AnalyticsPage() {
       ) : (
         <>
           {/* Key Metrics */}
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <Card className="border-border/50 shadow-sm">
               <CardContent className="p-3 md:p-4">
                 <div className="flex items-center justify-between mb-1">
@@ -183,6 +183,19 @@ export function AnalyticsPage() {
                 <p className="text-lg md:text-2xl font-bold text-foreground">{formatCurrency(avgPerExpense, currency)}</p>
               </CardContent>
             </Card>
+
+            <Card className="border-border/50 shadow-sm">
+              <CardContent className="p-3 md:p-4">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-[10px] md:text-xs text-muted-foreground font-medium uppercase tracking-wide">Savings rate</span>
+                  <PiggyBank className="w-3.5 h-3.5 text-primary" />
+                </div>
+                <p className="text-lg md:text-2xl font-bold text-foreground">{savingsRate.toFixed(0)}%</p>
+                <p className="text-[10px] md:text-xs text-muted-foreground mt-0.5 truncate">
+                  {formatCurrency(totalSaved, currency)} saved
+                </p>
+              </CardContent>
+            </Card>
           </div>
 
           {/* Charts Row */}
@@ -200,7 +213,7 @@ export function AnalyticsPage() {
             {/* Monthly Trend */}
             <Card className="border-border/50 shadow-sm">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-semibold">6-Month Trend</CardTitle>
+                <CardTitle className="text-sm font-semibold">6-Month Trend · Spent vs Saved</CardTitle>
               </CardHeader>
               <CardContent className="pt-0">
                 <div className="h-[200px] -mx-2">
@@ -211,9 +224,10 @@ export function AnalyticsPage() {
                       <YAxis stroke="hsl(var(--muted-foreground))" fontSize={10} tickLine={false} axisLine={false} tickFormatter={(v) => v === 0 ? "0" : `${currency.symbol}${v >= 1000 ? `${(v/1000).toFixed(0)}k` : v}`} width={40} />
                       <Tooltip
                         contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: "12px", fontSize: "12px" }}
-                        formatter={(value: number) => [formatCurrency(value, currency), "Spent"]}
+                        formatter={(value: number, name) => [formatCurrency(value, currency), name === "saved" ? "Saved" : "Spent"]}
                       />
-                      <Bar dataKey="amount" fill="hsl(var(--primary))" radius={[6, 6, 0, 0]} />
+                      <Bar dataKey="amount" name="amount" fill="hsl(var(--primary))" radius={[6, 6, 0, 0]} />
+                      <Bar dataKey="saved" name="saved" fill="hsl(var(--accent))" radius={[6, 6, 0, 0]} />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
