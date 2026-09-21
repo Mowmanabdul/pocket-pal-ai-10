@@ -11,7 +11,7 @@ serve(async (req) => {
   }
 
   try {
-    const { expenses, type, currency, categoryLabels } = await req.json();
+    const { expenses, type, currency, categoryLabels, savings } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
     // Default to USD if no currency provided
@@ -66,6 +66,12 @@ TONE:
 
 Expenses data:
 ${JSON.stringify(expenses, null, 2)}
+
+${savings ? `Savings data (goals and progress):
+${JSON.stringify(savings, null, 2)}
+
+Reference the user's savings goals and savings rate where relevant, and include a "## Savings Progress" section with one or two specific observations about their goals.` : ""}
+
 
 Structure your response as:
 

@@ -8,6 +8,7 @@ import { useCategoryLabelsContext } from "@/contexts/CategoryLabelsContext";
 import ReactMarkdown from "react-markdown";
 import { cn } from "@/lib/utils";
 import { useChatHistory } from "@/hooks/useChatHistory";
+import { useSavings } from "@/hooks/useSavings";
 
 interface AIChatPanelProps {
   expenses: Expense[];
