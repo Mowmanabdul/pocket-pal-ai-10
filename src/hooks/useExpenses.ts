@@ -115,6 +115,21 @@ export function useExpenses() {
     },
   });
 
+  const insertExpenses = async (
+    rows: { amount: number; category: ExpenseCategory; description?: string; date: string }[]
+  ) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error("User not authenticated");
+    if (rows.length === 0) return;
+
+    for (let i = 0; i < rows.length; i += 200) {
+      const chunk = rows.slice(i, i + 200).map((r) => ({ ...r, user_id: user.id }));
+      const { error } = await supabase.from("expenses").insert(chunk);
+      if (error) throw error;
+    }
+    queryClient.invalidateQueries({ queryKey: ["expenses"] });
+  };
+
   return {
     expenses,
     isLoading,
@@ -122,5 +137,6 @@ export function useExpenses() {
     addExpense,
     updateExpense,
     deleteExpense,
+    insertExpenses,
   };
 }
