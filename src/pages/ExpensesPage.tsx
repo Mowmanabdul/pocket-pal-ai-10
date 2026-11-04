@@ -4,7 +4,7 @@ import { ExpenseList } from "@/components/ExpenseList";
 import { ExpenseForm } from "@/components/ExpenseForm";
 import { ExpenseFilters } from "@/components/ExpenseFilters";
 import { DateRangePicker } from "@/components/DateRangePicker";
-import { CSVImportDialog } from "@/components/CSVImportDialog";
+import { StatementImportDialog } from "@/components/StatementImportDialog";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -180,7 +180,7 @@ export function ExpensesPage() {
         </div>
       </div>
 
-      <CSVImportDialog open={isImportOpen} onOpenChange={setIsImportOpen} />
+      <StatementImportDialog open={isImportOpen} onOpenChange={setIsImportOpen} />
 
       {/* Quick date range chips */}
       <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-hide -mx-1 px-1">
