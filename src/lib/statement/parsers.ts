@@ -326,7 +326,7 @@ export function autoDetectMapping(headers: string[]): StatementMapping {
   const amount = find([/^amount$/, /^amt$/, /\bamount\b/, /\bamt\b/, /^total\b/], /balance|running|available/);
   const debit = find([/debit/, /withdraw/, /paid\s*out/, /outflow/, /\bdr\b/]);
   const credit = find([/^credit$/, /credit(?! card)/, /deposit/, /paid\s*in/, /inflow/, /\bcr\b/], /card|limit/);
-  const description = find([/desc/, /narrative/, /detail/, /memo/, /payee/, /particular/, /reference/, /transaction/, /merchant/], /balance|category|type/);
+  const description = find([/desc/, /narrative/, /detail/, /memo/, /payee/, /particular/, /reference/, /transaction/, /merchant/, /beneficiary/, /card.?holder/], /balance|category|type/);
   const category = find([/\bcategory\b/, /^cat$/]);
 
   return { date, amount, debit, credit, description, category };
@@ -349,7 +349,10 @@ export function rowsToTransactions(
       const creditVal = mapping.credit ? parseAmountValue(row[mapping.credit] ?? "") ?? 0 : 0;
       if (debitVal > 0) amount = -Math.abs(debitVal);
       else if (creditVal > 0) amount = Math.abs(creditVal);
-    } else if (mapping.amount) {
+    }
+    // Some exports contain debit/credit columns alongside a signed Amount
+    // column; use Amount whenever those separate columns are blank on this row.
+    if (amount === null && mapping.amount) {
       const raw = parseAmountValue(row[mapping.amount] ?? "");
       if (raw === null) continue;
       amount = raw; // Keep the bank's sign: negative = expense, positive = income.
