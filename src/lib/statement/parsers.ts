@@ -321,11 +321,13 @@ export function autoDetectMapping(headers: string[]): StatementMapping {
   };
 
   const date = find([/^date$/, /trans(x|action)?\s*date/, /post(ed)?\s*date/, /date/, /value date/], /balance|birth|due/);
-  const amount = find([/^amount$/, /^amt$/, /amount/, /value/, /^total/], /balance|running|available/);
+  // Prefer an actual amount header: matching "value" alone incorrectly picks
+  // Value Date on common bank exports.
+  const amount = find([/^amount$/, /^amt$/, /\bamount\b/, /\bamt\b/, /^total\b/], /balance|running|available/);
   const debit = find([/debit/, /withdraw/, /paid\s*out/, /outflow/, /\bdr\b/]);
   const credit = find([/^credit$/, /credit(?! card)/, /deposit/, /paid\s*in/, /inflow/, /\bcr\b/], /card|limit/);
   const description = find([/desc/, /narrative/, /detail/, /memo/, /payee/, /particular/, /reference/, /transaction/, /merchant/], /balance|category|type/);
-  const category = find([/category/, /\btype\b/, /\bcat\b/]);
+  const category = find([/\bcategory\b/, /^cat$/]);
 
   return { date, amount, debit, credit, description, category };
 }
@@ -335,18 +337,6 @@ export function rowsToTransactions(
   mapping: StatementMapping,
   dayFirst: boolean
 ): StatementTransaction[] {
-  // Work out sign convention from the data when a single amount column is used
-  let signedMode: "signed" | "all-out" | null = null;
-  if (mapping.amount) {
-    const parsed = rows
-      .map((r) => parseAmountValue(r[mapping.amount] ?? ""))
-      .filter((n): n is number => n !== null);
-    const hasNeg = parsed.some((n) => n < 0);
-    const hasPos = parsed.some((n) => n > 0);
-    if (hasNeg && hasPos) signedMode = "signed";
-    else if (parsed.length > 2) signedMode = "all-out";
-  }
-
   const transactions: StatementTransaction[] = [];
   for (const row of rows) {
     const date = parseStatementDate(row[mapping.date] ?? "", dayFirst);
@@ -362,12 +352,18 @@ export function rowsToTransactions(
     } else if (mapping.amount) {
       const raw = parseAmountValue(row[mapping.amount] ?? "");
       if (raw === null) continue;
-      if (signedMode === "all-out") amount = -Math.abs(raw);
-      else amount = raw; // signed: negative = out, positive = in
+      amount = raw; // Keep the bank's sign: negative = expense, positive = income.
     }
     if (amount === null || amount === 0) continue;
 
-    const description = mapping.description ? row[mapping.description] ?? "" : "";
+    // Bank exports often split the useful merchant name across Description,
+    // Beneficiary/CardHolder, and Type columns. Combine those for categorizing
+    // and preserve them in the imported description.
+    const descriptorHeaders = headersForRow(rows, mapping.description);
+    const descriptorParts = descriptorHeaders
+      .map((header) => row[header]?.trim() ?? "")
+      .filter((value, index, values) => value && values.findIndex((v) => v.toLowerCase() === value.toLowerCase()) === index);
+    const description = descriptorParts.join(" · ");
     let category: ExpenseCategory = "other";
     if (mapping.category && row[mapping.category]) {
       const catStr = row[mapping.category].toLowerCase();
@@ -384,4 +380,11 @@ export function rowsToTransactions(
     throw new Error("Couldn't read any transactions — check the column mapping");
   }
   return transactions;
+}
+
+function headersForRow(rows: Record<string, string>[], selectedDescription: string): string[] {
+  const headers = Object.keys(rows[0] ?? {});
+  const descriptor = /description|narrative|detail|memo|payee|particular|reference|merchant|beneficiary|card.?holder|transaction.?type|^type$/i;
+  const selected = selectedDescription ? [selectedDescription] : [];
+  return [...new Set([...selected, ...headers.filter((header) => descriptor.test(header))])];
 }
