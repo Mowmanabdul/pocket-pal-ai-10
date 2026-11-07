@@ -1,4 +1,5 @@
-import { describe, expect, it } from "bun:test";
+import assert from "node:assert/strict";
+import { describe, it } from "node:test";
 import { autoDetectMapping, rowsToTransactions } from "./parsers";
 
 describe("bank statement tabular imports", () => {
@@ -24,12 +25,12 @@ describe("bank statement tabular imports", () => {
       },
     ], mapping, true);
 
-    expect(mapping.date).toBe("Value Date");
-    expect(mapping.amount).toBe("Amount");
-    expect(mapping.category).toBe("");
-    expect(transactions.map(({ amount }) => amount)).toEqual([-54, 12500]);
-    expect(transactions[0]?.category).toBe("food");
-    expect(transactions[0]?.description).toContain("Checkers Hyper");
+    assert.equal(mapping.date, "Value Date");
+    assert.equal(mapping.amount, "Amount");
+    assert.equal(mapping.category, "");
+    assert.deepEqual(transactions.map(({ amount }) => amount), [-54, 12500]);
+    assert.equal(transactions[0]?.category, "food");
+    assert.ok(transactions[0]?.description.includes("Checkers Hyper"));
   });
 
   it("keeps income positive even when every imported row is money in", () => {
@@ -38,6 +39,6 @@ describe("bank statement tabular imports", () => {
       { Date: "2026-11-06", Description: "Salary", Amount: "12500" },
     ], mapping, true);
 
-    expect(transactions[0]?.amount).toBe(12500);
+    assert.equal(transactions[0]?.amount, 12500);
   });
 });
