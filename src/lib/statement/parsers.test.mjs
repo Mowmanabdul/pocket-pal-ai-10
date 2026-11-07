@@ -1,6 +1,6 @@
+import { describe, expect, it } from "bun:test";
 import assert from "node:assert/strict";
-import { describe, it } from "node:test";
-import { autoDetectMapping, rowsToTransactions } from "./parsers";
+import { autoDetectMapping, rowsToTransactions } from "./parsers.ts";
 
 describe("bank statement tabular imports", () => {
   it("maps Amount rather than Value Date and preserves negative expenses and positive income", () => {
