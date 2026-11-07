@@ -18,6 +18,7 @@ Rules:
 - "date": the transaction (posted) date, formatted YYYY-MM-DD. If the year is missing, infer the most recent year that makes the date not in the future.
 - "description": the merchant name or transaction narration. Clean up reference numbers unless they identify the merchant.
 - "amount": signed number. Money IN (credits, deposits, salary) is POSITIVE. Money OUT (debits, card purchases, fees, withdrawals) is NEGATIVE. Ignore currency symbols.
+- When a statement has a signed Amount column, preserve its displayed sign exactly; never convert an all-negative list to positive amounts.
 - Include card purchases, EFTs, transfers out, fees, airtime, interest, and deposits.
 - EXCLUDE balance columns, running balances, account summaries, and headers.
 - If a page has no transactions, return an empty list for it.
